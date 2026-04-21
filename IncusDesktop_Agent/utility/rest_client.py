@@ -129,3 +129,43 @@ class IncusRestClient:
         except KeyError:
             code_error = f"Not supported status code: {status_code}"
         return code_error
+
+    def head(self, path: str, params: dict | None = None, *, headers: dict | None = None):
+        """HEAD — zwraca tylko dict nagłówków response, nie body."""
+        try:
+            response = self._client.request("HEAD", path, params=params, headers=headers)
+        except httpx.RequestError as exc:
+            raise IncusError(f"transport error: {exc}") from exc
+        if response.status_code >= 400:
+            raise IncusError(f"http {response.status_code}")
+        return dict(response.headers)
+
+    def get_raw_with_headers(self, path: str, params: dict | None = None, *, headers: dict | None = None) -> tuple[
+        bytes, dict]:
+        """GET raw z headerami — dla /files gdzie metadata jest w X-Incus-*."""
+        try:
+            response = self._client.request("GET", path, params=params, headers=headers)
+        except httpx.RequestError as exc:
+            raise IncusError(f"transport error: {exc}") from exc
+        if response.status_code >= 400:
+            raise IncusError(f"http {response.status_code}: {response.text[:200]}")
+        return response.content, dict(response.headers)
+
+    def post_raw(self, path: str, content: bytes, *, params: dict | None = None, headers: dict | None = None):
+        """POST raw bytes (octet-stream) — upload plikow."""
+        req_headers = {"Content-Type": "application/octet-stream"}
+        if headers:
+            req_headers.update(headers)
+        try:
+            response = self._client.request("POST", path, params=params, headers=req_headers, content=content)
+        except httpx.RequestError as exc:
+            raise IncusError(f"transport error: {exc}") from exc
+        return self._handle_envelope(response, wait=False, wait_timeout=0)
+
+    def delete_with_headers(self, path: str, *, params: dict | None = None, headers: dict | None = None):
+        """DELETE z custom headers — dla X-Incus-force przy recursive delete."""
+        try:
+            response = self._client.request("DELETE", path, params=params, headers=headers)
+        except httpx.RequestError as exc:
+            raise IncusError(f"transport error: {exc}") from exc
+        return self._handle_envelope(response, wait=False, wait_timeout=0)
