@@ -119,6 +119,18 @@ class InstanceSnapshot(BaseModel):
     expanded_devices: dict[str, Any] | None = None
 
 
+# ─── InstanceMetadata ──────────────────────────────────────────────────────
+
+class InstanceMetadata(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    architecture: str | None = None
+    creation_date: int | None = None
+    expiry_date: int | None = None
+    properties: dict[str, Any] | None = None
+    templates: dict[str, Any] | None = None
+
+
 # ─── InstanceBackup ────────────────────────────────────────────────────────
 
 class InstanceBackup(BaseModel):

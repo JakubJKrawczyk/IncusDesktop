@@ -74,13 +74,16 @@ class InstancesController:
 Każda metoda `async def`, zwraca to samo co wcześniej (Pydantic models / `OperationModel` / `EmptySyncResponse` / `bytes`). Każda metoda poprzedzona komentarzem `# VERB /1.0/path (async|sync|raw)`.
 
 ### Blueprints — Flask 2+ async routes
+
 ```python
 from flask import Blueprint, current_app, jsonify, request
-from controllers.instances import InstancesController
+from controllers.incus.instances import InstancesController
 
 bp = Blueprint("instances", __name__, url_prefix="/instances")
 
+
 def _ctrl(): return InstancesController(current_app.extensions["incus"])
+
 
 @bp.get("")
 async def list_instances():
@@ -88,6 +91,7 @@ async def list_instances():
     filter_ = request.args.get("filter")
     data = await _ctrl().list_instances(project=project, filter=filter_)
     return jsonify(data)
+
 
 @bp.post("")
 async def create_instance():
