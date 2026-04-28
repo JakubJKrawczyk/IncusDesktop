@@ -77,7 +77,7 @@ Każda metoda `async def`, zwraca to samo co wcześniej (Pydantic models / `Oper
 
 ```python
 from flask import Blueprint, current_app, jsonify, request
-from controllers.incus.instances import InstancesController
+from Agent.controllers.incus.instances import InstancesController
 
 bp = Blueprint("instances", __name__, url_prefix="/instances")
 
@@ -195,39 +195,42 @@ Pydantic z `ConfigDict(extra="allow")`, re-use: `OperationModel`, `EmptySyncResp
 ---
 
 ## app.py (async) — rejestracja
+
 ```python
 # app.py
 import atexit, asyncio
 from flask import Flask
 
-from blueprints.instances_bp import bp as instances_bp
-from blueprints.instancesExec_bp import bp as instances_exec_bp
+from Agent.blueprints.instances_bp import bp as instances_bp
+from Agent.blueprints.instancesExec_bp import bp as instances_exec_bp
 # ... (wszystkie poniższe dodawane fazami)
-from utility.rest_client import IncusRestClient
+from Agent.utility.rest_client import IncusRestClient
+
 
 def create_app() -> Flask:
-    app = Flask(__name__)
-    client = IncusRestClient()
-    app.extensions["incus"] = client
+   app = Flask(__name__)
+   client = IncusRestClient()
+   app.extensions["incus"] = client
 
-    app.register_blueprint(instances_bp)
-    app.register_blueprint(instances_exec_bp)
-    # Faza 1
-    # app.register_blueprint(instances_snapshots_bp)
-    # app.register_blueprint(instances_backups_bp)
-    # app.register_blueprint(instances_metadata_bp)
-    # app.register_blueprint(instances_misc_bp)
-    # Faza 2
-    # app.register_blueprint(images_bp)
-    # ... i tak dalej
+   app.register_blueprint(instances_bp)
+   app.register_blueprint(instances_exec_bp)
+   # Faza 1
+   # app.register_blueprint(instances_snapshots_bp)
+   # app.register_blueprint(instances_backups_bp)
+   # app.register_blueprint(instances_metadata_bp)
+   # app.register_blueprint(instances_misc_bp)
+   # Faza 2
+   # app.register_blueprint(images_bp)
+   # ... i tak dalej
 
-    atexit.register(lambda: asyncio.run(client.close()))
-    return app
+   atexit.register(lambda: asyncio.run(client.close()))
+   return app
+
 
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+   app.run(host="127.0.0.1", port=5000, debug=True)
 ```
 Każdy blueprint dzielący prefix musi mieć **unikalną nazwę** w `Blueprint("unique_name", ...)`.
 
