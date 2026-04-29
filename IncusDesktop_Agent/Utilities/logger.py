@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from xmlrpc.client import DateTime
-from rich import Console
+from rich.console import Console
 
 class LoggLevel(Enum):
     INFO="[bold][INFO][/bold]"

@@ -1,9 +1,9 @@
 import json
+from pathlib import Path
 from typing import Any
 import httpx
 
 from Agent.models.consts import StatusCode
-
 
 class IncusError(Exception):
     code = "INCUS_ERROR"
@@ -14,6 +14,8 @@ class IncusRestClient:
     DEFAULT_SOCKET = "/var/lib/incus/unix.socket"
 
     def __init__(self, socket_path: str = DEFAULT_SOCKET, timeout: float = 30.0):
+        if Path(IncusRestClient.DEFAULT_SOCKET).exists():
+            incus_path_exists = True
         transport = httpx.AsyncHTTPTransport(uds=socket_path)
 
         self._client = httpx.AsyncClient(
@@ -60,6 +62,7 @@ class IncusRestClient:
             wait_timeout: int = 60,
             raw: bool = False,
     ):
+
         try:
             response = await self._client.request(method, path, params=params, json=json_body)
         except httpx.RequestError as exc:

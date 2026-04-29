@@ -1,8 +1,13 @@
 # app.py
 import asyncio
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
 import atexit
 
-from flask import Flask
+from flask import Flask, jsonify
 
 from Agent.blueprints.instances_bp import bp as instances_bp
 from Agent.blueprints.instancesExec_bp import bp as instances_exec_bp
@@ -49,9 +54,19 @@ from Agent.utility.rest_client import IncusRestClient
 
 
 def create_app() -> Flask:
+    load_dotenv()
     app = Flask(__name__)
 
     client = IncusRestClient()
+
+    @app.before_request
+    def check_requirements():
+        is_dev =os.getenv("DEVELOPER_MODE")
+
+        if not Path(IncusRestClient.DEFAULT_SOCKET).exists() and not is_dev:
+            return jsonify({"Error": "Incus is not installed and default unix socket file was not found. Install incus then run api again."}), 503
+        return None
+
     app.extensions["incus"] = client
 
     app.register_blueprint(instances_bp)

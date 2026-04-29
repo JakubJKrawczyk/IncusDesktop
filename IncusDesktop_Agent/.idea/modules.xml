@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/IncusDesktop_Agent.iml" filepath="$PROJECT_DIR$/.idea/IncusDesktop_Agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/incuscli.iml" filepath="$PROJECT_DIR$/.idea/incuscli.iml" />
     </modules>
   </component>
 </project>

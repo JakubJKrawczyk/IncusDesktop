@@ -10,8 +10,9 @@ from Utilities.logger import Logger, LoggLevel
 logger = Logger("[RAW.EXAMPLES]", consts.ConfigVariables.DEFAULT_LOGS_INCUS.value)
 
 
-class ExamplesController:
-    # rawCommand: examples.echo_dupa
-    async def echo_dupa(self) -> CommandResult:
-        logger.line("Invoke echo_dupa", LoggLevel.INFO)
-        return await run(["echo", "dupa"], timeout=5.0)
+class RawCommandsController:
+
+    #Command to check incus status
+    async def HealthCheckIncus(self) -> CommandResult:
+        logger.line("Checking incus health", LoggLevel.INFO)
+        return await run(["systemctl", "status", "incus.service"], timeout=5.0)
