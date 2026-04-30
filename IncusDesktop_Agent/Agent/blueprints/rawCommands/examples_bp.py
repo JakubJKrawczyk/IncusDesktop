@@ -2,7 +2,7 @@ from dataclasses import asdict
 
 from flask import Blueprint, jsonify
 
-from Agent.controllers.agent.rawCommands.examples import RawCommandsController
+from Agent.controllers.agent.rawCommands.rawCommands import RawCommandsController
 
 
 bp = Blueprint("commands", __name__, url_prefix="/command")
