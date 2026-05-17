@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.server import ServerController
+from Agent.models.server_model import ServerModel
 
 
 bp = Blueprint("server", __name__)
@@ -24,14 +25,14 @@ async def server_info():
 
 @bp.put("/server")
 async def update_server():
-    body = request.get_json(force=True)
+    body = ServerModel.model_validate(request.get_json(force=True))
     await _ctrl().update_server(body=body)
     return "", 200
 
 
 @bp.patch("/server")
 async def patch_server():
-    body = request.get_json(force=True)
+    body = ServerModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_server(body=body)
     return "", 204
 

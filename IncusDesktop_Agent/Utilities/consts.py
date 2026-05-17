@@ -9,3 +9,7 @@ class ConfigVariables(Enum):
     DEFAULT_LOGS_INCUS = f"{DEFAULT_LOGS_PATH}incus.log"
     DEFAULT_LOGS_CLI = f"{DEFAULT_LOGS_PATH}cli.log"
     DEFAULT_LOGS_AGENT = f"{DEFAULT_LOGS_PATH}agents/"
+
+class Tests(Enum):
+    DEFAULT_TESTS_PORT = 8080
+    DEFAULT_TESTS_URL = f"http://localhost:{DEFAULT_TESTS_PORT}"

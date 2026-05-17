@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.networks import NetworksController
+from Agent.models.network_model import NetworkModel
 
 
 bp = Blueprint("networks", __name__, url_prefix="/networks")
@@ -24,7 +25,7 @@ async def list_networks():
 @bp.post("")
 async def create_network():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkModel.model_validate(request.get_json(force=True))
     await _ctrl().create_network(body=body, project=project)
     return "", 200
 
@@ -50,7 +51,7 @@ async def network_info(name: str):
 @bp.put("/<name>")
 async def update_network(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkModel.model_validate(request.get_json(force=True))
     await _ctrl().update_network(name=name, body=body, project=project)
     return "", 200
 
@@ -58,7 +59,7 @@ async def update_network(name: str):
 @bp.patch("/<name>")
 async def patch_network(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_network(name=name, body=body, project=project)
     return "", 204
 

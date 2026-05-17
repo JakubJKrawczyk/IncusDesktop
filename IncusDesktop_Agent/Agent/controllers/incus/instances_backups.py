@@ -15,10 +15,10 @@ class InstancesBackupsController:
         )
 
     # POST /1.0/instances/{name}/backups (async)
-    async def create_backup(self, name: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_backup(self, name: str, body: InstanceBackup, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/instances/{name}/backups",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.networks_peers import NetworksPeersController
+from Agent.models.network_model import NetworkPeer
 
 
 bp = Blueprint("networks_peers", __name__, url_prefix="/networks")
@@ -21,7 +22,7 @@ async def list_peers(network: str):
 @bp.post("/<network>/peers")
 async def create_peer(network: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkPeer.model_validate(request.get_json(force=True))
     await _ctrl().create_peer(network=network, body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def peer_info(network: str, peer_name: str):
 @bp.put("/<network>/peers/<peer_name>")
 async def update_peer(network: str, peer_name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkPeer.model_validate(request.get_json(force=True))
     await _ctrl().update_peer(network=network, peer_name=peer_name, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_peer(network: str, peer_name: str):
 @bp.patch("/<network>/peers/<peer_name>")
 async def patch_peer(network: str, peer_name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkPeer.model_validate(request.get_json(force=True))
     await _ctrl().patch_peer(network=network, peer_name=peer_name, body=body, project=project)
     return "", 204
 

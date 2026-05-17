@@ -15,10 +15,10 @@ class NetworksLoadBalancersController:
         )
 
     # POST /1.0/networks/{network}/load-balancers (sync)
-    async def create_load_balancer(self, network: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_load_balancer(self, network: str, body: NetworkLoadBalancer, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/networks/{network}/load-balancers",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworksLoadBalancersController:
         )
 
     # PUT /1.0/networks/{network}/load-balancers/{listenAddress} (sync)
-    async def update_load_balancer(self, network: str, listen_address: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_load_balancer(self, network: str, listen_address: str, body: NetworkLoadBalancer, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/networks/{network}/load-balancers/{listen_address}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/networks/{network}/load-balancers/{listenAddress} (sync)
-    async def patch_load_balancer(self, network: str, listen_address: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_load_balancer(self, network: str, listen_address: str, body: NetworkLoadBalancer, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/networks/{network}/load-balancers/{listen_address}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

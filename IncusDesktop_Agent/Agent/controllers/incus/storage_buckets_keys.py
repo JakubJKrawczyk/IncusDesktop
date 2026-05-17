@@ -15,10 +15,10 @@ class StorageBucketsKeysController:
         )
 
     # POST .../buckets/{bucket}/keys (sync)
-    async def create_key(self, pool: str, bucket: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_key(self, pool: str, bucket: str, body: StorageBucketKey, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/buckets/{bucket}/keys",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class StorageBucketsKeysController:
         )
 
     # PUT .../keys/{key} (sync)
-    async def update_key(self, pool: str, bucket: str, key: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_key(self, pool: str, bucket: str, key: str, body: StorageBucketKey, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/storage-pools/{pool}/buckets/{bucket}/keys/{key}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH .../keys/{key} (sync)
-    async def patch_key(self, pool: str, bucket: str, key: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_key(self, pool: str, bucket: str, key: str, body: StorageBucketKey, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/storage-pools/{pool}/buckets/{bucket}/keys/{key}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

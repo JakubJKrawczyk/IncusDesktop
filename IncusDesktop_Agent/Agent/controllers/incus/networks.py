@@ -24,10 +24,10 @@ class NetworksController:
         )
 
     # POST /1.0/networks (sync)
-    async def create_network(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_network(self, body: NetworkModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/networks",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -39,18 +39,18 @@ class NetworksController:
         )
 
     # PUT /1.0/networks/{name} (sync)
-    async def update_network(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_network(self, name: str, body: NetworkModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/networks/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/networks/{name} (sync)
-    async def patch_network(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_network(self, name: str, body: NetworkModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/networks/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

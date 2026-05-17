@@ -15,10 +15,10 @@ class NetworksPeersController:
         )
 
     # POST /1.0/networks/{network}/peers (sync)
-    async def create_peer(self, network: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_peer(self, network: str, body: NetworkPeer, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/networks/{network}/peers",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworksPeersController:
         )
 
     # PUT /1.0/networks/{network}/peers/{peerName} (sync)
-    async def update_peer(self, network: str, peer_name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_peer(self, network: str, peer_name: str, body: NetworkPeer, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/networks/{network}/peers/{peer_name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/networks/{network}/peers/{peerName} (sync)
-    async def patch_peer(self, network: str, peer_name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_peer(self, network: str, peer_name: str, body: NetworkPeer, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/networks/{network}/peers/{peer_name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

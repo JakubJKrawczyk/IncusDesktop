@@ -23,18 +23,18 @@ class StorageVolumesController:
         )
 
     # POST /1.0/storage-pools/{pool}/volumes (sync, JSON create)
-    async def create_volume(self, pool: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_volume(self, pool: str, body: StorageVolumeModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # POST /1.0/storage-pools/{pool}/volumes/{type} (sync, typed create)
-    async def create_volume_by_type(self, pool: str, type: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_volume_by_type(self, pool: str, type: str, body: StorageVolumeModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes/{type}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -61,26 +61,26 @@ class StorageVolumesController:
         )
 
     # PUT /1.0/storage-pools/{pool}/volumes/{type}/{name} (sync)
-    async def update_volume(self, pool: str, type: str, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_volume(self, pool: str, type: str, name: str, body: StorageVolumeModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/storage-pools/{pool}/volumes/{type}/{name} (sync)
-    async def patch_volume(self, pool: str, type: str, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_volume(self, pool: str, type: str, name: str, body: StorageVolumeModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # POST /1.0/storage-pools/{pool}/volumes/{type}/{name} (async, rename/migrate)
-    async def rename_volume(self, pool: str, type: str, name: str, body: dict, project: str = "default") -> OperationModel:
+    async def rename_volume(self, pool: str, type: str, name: str, body: StorageVolumeModel, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

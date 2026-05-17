@@ -15,10 +15,10 @@ class NetworkACLsController:
         )
 
     # POST /1.0/network-acls (sync)
-    async def create_acl(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_acl(self, body: NetworkACLModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/network-acls",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworkACLsController:
         )
 
     # PUT /1.0/network-acls/{name} (sync)
-    async def update_acl(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_acl(self, name: str, body: NetworkACLModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/network-acls/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/network-acls/{name} (sync)
-    async def patch_acl(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_acl(self, name: str, body: NetworkACLModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/network-acls/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

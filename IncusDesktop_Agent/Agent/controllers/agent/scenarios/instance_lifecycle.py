@@ -5,6 +5,7 @@ from Agent.controllers.agent.scenarios import _helpers
 from Agent.controllers.agent.scenarios._runner import ScenarioRunner
 from Agent.controllers.incus.instances import InstancesController
 from Agent.controllers.incus.instances_snapshots import InstancesSnapshotsController
+from Agent.models.instance_model import InstanceModel, InstanceSnapshot
 from Agent.models.scenarios.instance import (
     CloneSpec,
     DecommissionSpec,
@@ -44,14 +45,14 @@ class InstanceLifecycleScenarios:
 
         async with runner.step("create_instance") as step:
             config, devices = self._build_config_devices(spec)
-            body: dict[str, Any] = {
+            body = InstanceModel.model_validate({
                 "name": spec.name,
                 "type": spec.instance_type,
                 "source": {"type": "image", "fingerprint": fingerprint},
                 "profiles": spec.profiles,
                 "config": config,
                 "devices": devices,
-            }
+            })
             await self._instances.create_instance(body=body, project=spec.project)
             step.detail["config_keys"] = list(config.keys())
             step.detail["device_keys"] = list(devices.keys())
@@ -136,7 +137,7 @@ class InstanceLifecycleScenarios:
             if spec.target_project and spec.target_project != spec.project:
                 source["project"] = spec.project
 
-            body: dict[str, Any] = {"name": spec.target_name, "source": source}
+            body = InstanceModel.model_validate({"name": spec.target_name, "source": source})
             target_project = spec.target_project or spec.project
             await self._instances.create_instance(body=body, project=target_project)
             step.detail["target"] = spec.target_name
@@ -182,7 +183,7 @@ class InstanceLifecycleScenarios:
             async with runner.step("final_snapshot") as step:
                 await self._snapshots.create_snapshot(
                     spec.name,
-                    body={"name": snap_name, "stateful": False},
+                    body=InstanceSnapshot(name=snap_name, stateful=False),
                     project=spec.project,
                 )
                 step.detail["snapshot"] = snap_name
@@ -212,7 +213,7 @@ class InstanceLifecycleScenarios:
         async with runner.step("restore") as step:
             await self._instances.update_instance(
                 name=spec.name,
-                body={"restore": spec.snapshot},
+                body=InstanceModel(restore=spec.snapshot),
                 project=spec.project,
             )
             step.detail["snapshot"] = spec.snapshot

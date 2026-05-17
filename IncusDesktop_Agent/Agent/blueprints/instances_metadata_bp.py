@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.instances_metadata import InstancesMetadataController
+from Agent.models.instance_model import InstanceMetadata
 
 
 bp = Blueprint("instances_metadata", __name__, url_prefix="/instances")
@@ -20,7 +21,7 @@ async def get_metadata(name: str):
 @bp.put("/<name>/metadata")
 async def update_metadata(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceMetadata.model_validate(request.get_json(force=True))
     await _ctrl().update_metadata(name=name, body=body, project=project)
     return "", 204
 
@@ -28,7 +29,7 @@ async def update_metadata(name: str):
 @bp.patch("/<name>/metadata")
 async def patch_metadata(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceMetadata.model_validate(request.get_json(force=True))
     await _ctrl().patch_metadata(name=name, body=body, project=project)
     return "", 204
 

@@ -17,6 +17,10 @@ from Agent.controllers.incus.networks_forwards import NetworksForwardsController
 from Agent.controllers.incus.profiles import ProfilesController
 from Agent.controllers.incus.storage_pools import StoragePoolsController
 from Agent.controllers.incus.storage_volumes import StorageVolumesController
+from Agent.models.image_model import ImageAliasModel, ImageModel
+from Agent.models.network_model import NetworkForward, NetworkModel
+from Agent.models.profile_model import ProfileModel
+from Agent.models.storage_model import StoragePoolModel, StorageVolumeModel
 from Agent.utility.rest_client import IncusError, IncusRestClient
 from Utilities import consts
 from Utilities.logger import Logger, LoggLevel
@@ -52,7 +56,7 @@ async def ensure_image(
 
     logger.line(f"Pulling image alias={alias} server={server} protocol={protocol}", LoggLevel.INFO)
     op_metadata = await images.create_image(
-        body={
+        body=ImageModel.model_validate({
             "source": {
                 "type": "image",
                 "mode": "pull",
@@ -60,7 +64,7 @@ async def ensure_image(
                 "protocol": protocol,
                 "alias": alias,
             },
-        },
+        }),
         project=project,
     )
 
@@ -72,7 +76,7 @@ async def ensure_image(
 
     try:
         await images.create_alias(
-            body={"name": alias, "target": fingerprint},
+            body=ImageAliasModel(name=alias, target=fingerprint),
             project=project,
         )
         logger.line(f"Image alias registered alias={alias} fingerprint={fingerprint}", LoggLevel.INFO)
@@ -115,7 +119,7 @@ async def ensure_network(
 
     logger.line(f"Creating network name={name} type={type}", LoggLevel.INFO)
     await networks.create_network(
-        body={"name": name, "type": type, "config": config or {}},
+        body=NetworkModel(name=name, type=type, config=config or {}),
         project=project,
     )
     logger.line(f"Network created name={name}", LoggLevel.INFO)
@@ -144,10 +148,12 @@ async def ensure_network_forward(
     except IncusError:
         pass
 
-    body: dict[str, Any] = {"listen_address": listen_address, "ports": ports or []}
-    if description is not None:
-        body["description"] = description
-    logger.line(f"Creating network forward network={network} listen={listen_address} ports={len(body['ports'])}", LoggLevel.INFO)
+    body = NetworkForward(
+        listen_address=listen_address,
+        ports=ports or [],
+        description=description,
+    )
+    logger.line(f"Creating network forward network={network} listen={listen_address} ports={len(body.ports or [])}", LoggLevel.INFO)
     await forwards.create_forward(network, body=body, project=project)
     logger.line(f"Network forward created network={network} listen={listen_address}", LoggLevel.INFO)
     return True
@@ -172,7 +178,7 @@ async def ensure_storage_pool(
         pass
 
     logger.line(f"Creating storage pool name={name} driver={driver}", LoggLevel.INFO)
-    await pools.create_pool(body={"name": name, "driver": driver, "config": config or {}})
+    await pools.create_pool(body=StoragePoolModel(name=name, driver=driver, config=config or {}))
     logger.line(f"Storage pool created name={name}", LoggLevel.INFO)
     return True
 
@@ -203,7 +209,7 @@ async def ensure_storage_volume(
     logger.line(f"Creating storage volume pool={pool} name={name} size={size}", LoggLevel.INFO)
     await volumes.create_volume(
         pool=pool,
-        body={"name": name, "type": type, "config": vol_config},
+        body=StorageVolumeModel(name=name, type=type, config=vol_config),
         project=project,
     )
     logger.line(f"Storage volume created pool={pool} name={name}", LoggLevel.INFO)
@@ -230,13 +236,12 @@ async def ensure_profile(
     except IncusError:
         pass
 
-    body: dict[str, Any] = {
-        "name": name,
-        "config": config or {},
-        "devices": devices or {},
-    }
-    if description is not None:
-        body["description"] = description
+    body = ProfileModel(
+        name=name,
+        config=config or {},
+        devices=devices or {},
+        description=description,
+    )
     logger.line(f"Creating profile name={name} project={project}", LoggLevel.INFO)
     await profiles.create_profile(body=body, project=project)
     logger.line(f"Profile created name={name}", LoggLevel.INFO)

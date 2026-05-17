@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_volumes import StorageVolumesController
+from Agent.models.storage_model import StorageVolumeModel
 
 
 bp = Blueprint("storage_volumes", __name__, url_prefix="/storage-pools")
@@ -25,7 +26,7 @@ async def list_volumes(pool: str):
 @bp.post("/<pool>/volumes")
 async def create_volume(pool: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeModel.model_validate(request.get_json(force=True))
     await _ctrl().create_volume(pool=pool, body=body, project=project)
     return "", 200
 
@@ -46,7 +47,7 @@ async def create_volume_or_import(pool: str, type: str):
         return jsonify(await _ctrl().import_volume_from_backup(
             pool=pool, content=request.get_data(), headers=headers, project=project,
         )), 202
-    body = request.get_json(force=True)
+    body = StorageVolumeModel.model_validate(request.get_json(force=True))
     await _ctrl().create_volume_by_type(pool=pool, type=type, body=body, project=project)
     return "", 200
 
@@ -76,7 +77,7 @@ async def volume_info(pool: str, type: str, name: str):
 @bp.put("/<pool>/volumes/<type>/<name>")
 async def update_volume(pool: str, type: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeModel.model_validate(request.get_json(force=True))
     await _ctrl().update_volume(pool=pool, type=type, name=name, body=body, project=project)
     return "", 200
 
@@ -84,7 +85,7 @@ async def update_volume(pool: str, type: str, name: str):
 @bp.patch("/<pool>/volumes/<type>/<name>")
 async def patch_volume(pool: str, type: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_volume(pool=pool, type=type, name=name, body=body, project=project)
     return "", 204
 
@@ -92,7 +93,7 @@ async def patch_volume(pool: str, type: str, name: str):
 @bp.post("/<pool>/volumes/<type>/<name>")
 async def rename_volume(pool: str, type: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeModel.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().rename_volume(
         pool=pool, type=type, name=name, body=body, project=project,
     )), 202

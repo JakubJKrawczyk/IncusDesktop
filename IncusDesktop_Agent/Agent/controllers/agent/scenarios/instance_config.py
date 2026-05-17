@@ -4,6 +4,8 @@ from Agent.controllers.agent.scenarios import _helpers
 from Agent.controllers.agent.scenarios._runner import ScenarioRunner
 from Agent.controllers.incus.instances import InstancesController
 from Agent.controllers.incus.instances_exec import InstancesExecController
+from Agent.models.instance_model import InstanceModel
+from Agent.models.network_model import NetworkForward
 from Agent.models.scenarios.instance import (
     AttachNetworkSpec,
     AttachVolumeSpec,
@@ -54,7 +56,11 @@ class InstanceConfigScenarios:
                 runner.skip("restart", reason="no changes")
                 return runner.finish(result={"name": spec.name, "changed": False})
 
-            await self._instances.patch_instance(spec.name, body=patch_body, project=spec.project)
+            await self._instances.patch_instance(
+                spec.name,
+                body=InstanceModel.model_validate(patch_body),
+                project=spec.project,
+            )
             step.detail["applied"] = patch_body
 
         if spec.restart_if_required and running:
@@ -102,7 +108,7 @@ class InstanceConfigScenarios:
 
             await self._instances.patch_instance(
                 spec.instance,
-                body={"devices": {device_name: device}},
+                body=InstanceModel(devices={device_name: device}),
                 project=spec.project,
             )
             step.detail["device_name"] = device_name
@@ -146,7 +152,7 @@ class InstanceConfigScenarios:
 
             await self._instances.patch_instance(
                 spec.instance,
-                body={"devices": {device_name: device}},
+                body=InstanceModel(devices={device_name: device}),
                 project=spec.project,
             )
             step.detail["device_name"] = device_name
@@ -224,7 +230,7 @@ class InstanceConfigScenarios:
         new_ports = list(ports or []) + [port_entry]
         await forwards.patch_forward(
             network, listen_address,
-            body={"ports": new_ports},
+            body=NetworkForward(ports=new_ports),
             project=project,
         )
 

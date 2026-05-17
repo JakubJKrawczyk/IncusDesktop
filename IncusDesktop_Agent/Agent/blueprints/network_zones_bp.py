@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.network_zones import NetworkZonesController
+from Agent.models.network_zone_model import NetworkZoneModel
 
 
 bp = Blueprint("network_zones", __name__, url_prefix="/network-zones")
@@ -21,7 +22,7 @@ async def list_zones():
 @bp.post("")
 async def create_zone():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneModel.model_validate(request.get_json(force=True))
     await _ctrl().create_zone(body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def zone_info(name: str):
 @bp.put("/<name>")
 async def update_zone(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneModel.model_validate(request.get_json(force=True))
     await _ctrl().update_zone(name=name, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_zone(name: str):
 @bp.patch("/<name>")
 async def patch_zone(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_zone(name=name, body=body, project=project)
     return "", 204
 

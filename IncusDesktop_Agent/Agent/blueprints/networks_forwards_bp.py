@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.networks_forwards import NetworksForwardsController
+from Agent.models.network_model import NetworkForward
 
 
 bp = Blueprint("networks_forwards", __name__, url_prefix="/networks")
@@ -21,7 +22,7 @@ async def list_forwards(network: str):
 @bp.post("/<network>/forwards")
 async def create_forward(network: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkForward.model_validate(request.get_json(force=True))
     await _ctrl().create_forward(network=network, body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def forward_info(network: str, listen_address: str):
 @bp.put("/<network>/forwards/<listen_address>")
 async def update_forward(network: str, listen_address: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkForward.model_validate(request.get_json(force=True))
     await _ctrl().update_forward(network=network, listen_address=listen_address, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_forward(network: str, listen_address: str):
 @bp.patch("/<network>/forwards/<listen_address>")
 async def patch_forward(network: str, listen_address: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkForward.model_validate(request.get_json(force=True))
     await _ctrl().patch_forward(network=network, listen_address=listen_address, body=body, project=project)
     return "", 204
 

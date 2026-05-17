@@ -16,10 +16,10 @@ class StorageVolumesSnapshotsController:
         )
 
     # POST .../volumes/{type}/{volume}/snapshots (async)
-    async def create_snapshot(self, pool: str, type: str, volume: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_snapshot(self, pool: str, type: str, volume: str, body: StorageVolumeSnapshot, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{volume}/snapshots",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -31,18 +31,18 @@ class StorageVolumesSnapshotsController:
         )
 
     # PUT .../snapshots/{snapshot} (sync)
-    async def update_snapshot(self, pool: str, type: str, volume: str, snapshot: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_snapshot(self, pool: str, type: str, volume: str, snapshot: str, body: StorageVolumeSnapshot, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{volume}/snapshots/{snapshot}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH .../snapshots/{snapshot} (sync)
-    async def patch_snapshot(self, pool: str, type: str, volume: str, snapshot: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_snapshot(self, pool: str, type: str, volume: str, snapshot: str, body: StorageVolumeSnapshot, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{volume}/snapshots/{snapshot}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_volumes_snapshots import StorageVolumesSnapshotsController
+from Agent.models.storage_model import StorageVolumeSnapshot
 
 
 bp = Blueprint("storage_volumes_snapshots", __name__, url_prefix="/storage-pools")
@@ -21,7 +22,7 @@ async def list_snapshots(pool: str, type: str, volume: str):
 @bp.post("/<pool>/volumes/<type>/<volume>/snapshots")
 async def create_snapshot(pool: str, type: str, volume: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeSnapshot.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_snapshot(pool=pool, type=type, volume=volume, body=body, project=project)), 202
 
 
@@ -34,7 +35,7 @@ async def snapshot_info(pool: str, type: str, volume: str, snapshot: str):
 @bp.put("/<pool>/volumes/<type>/<volume>/snapshots/<snapshot>")
 async def update_snapshot(pool: str, type: str, volume: str, snapshot: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeSnapshot.model_validate(request.get_json(force=True))
     await _ctrl().update_snapshot(pool=pool, type=type, volume=volume, snapshot=snapshot, body=body, project=project)
     return "", 200
 
@@ -42,7 +43,7 @@ async def update_snapshot(pool: str, type: str, volume: str, snapshot: str):
 @bp.patch("/<pool>/volumes/<type>/<volume>/snapshots/<snapshot>")
 async def patch_snapshot(pool: str, type: str, volume: str, snapshot: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeSnapshot.model_validate(request.get_json(force=True))
     await _ctrl().patch_snapshot(pool=pool, type=type, volume=volume, snapshot=snapshot, body=body, project=project)
     return "", 204
 

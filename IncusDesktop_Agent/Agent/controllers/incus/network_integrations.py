@@ -15,20 +15,29 @@ class NetworkIntegrationsController:
         )
 
     # POST /1.0/network-integrations (sync)
-    async def create_integration(self, body: dict) -> EmptySyncResponse:
-        return await self._client.post("/1.0/network-integrations", json_body=body)
+    async def create_integration(self, body: NetworkIntegrationModel) -> EmptySyncResponse:
+        return await self._client.post(
+            "/1.0/network-integrations",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # GET /1.0/network-integrations/{name} (sync)
     async def integration_info(self, name: str) -> NetworkIntegrationModel:
         return await self._client.get(f"/1.0/network-integrations/{name}")
 
     # PUT /1.0/network-integrations/{name} (sync)
-    async def update_integration(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.put(f"/1.0/network-integrations/{name}", json_body=body)
+    async def update_integration(self, name: str, body: NetworkIntegrationModel) -> EmptySyncResponse:
+        return await self._client.put(
+            f"/1.0/network-integrations/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # PATCH /1.0/network-integrations/{name} (sync)
-    async def patch_integration(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.patch(f"/1.0/network-integrations/{name}", json_body=body)
+    async def patch_integration(self, name: str, body: NetworkIntegrationModel) -> EmptySyncResponse:
+        return await self._client.patch(
+            f"/1.0/network-integrations/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # POST /1.0/network-integrations/{name} (sync, rename)
     async def rename_integration(self, name: str, new_name: str) -> EmptySyncResponse:

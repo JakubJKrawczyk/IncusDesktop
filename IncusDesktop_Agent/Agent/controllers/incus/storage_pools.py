@@ -15,20 +15,29 @@ class StoragePoolsController:
         )
 
     # POST /1.0/storage-pools (sync)
-    async def create_pool(self, body: dict) -> EmptySyncResponse:
-        return await self._client.post("/1.0/storage-pools", json_body=body)
+    async def create_pool(self, body: StoragePoolModel) -> EmptySyncResponse:
+        return await self._client.post(
+            "/1.0/storage-pools",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # GET /1.0/storage-pools/{name} (sync)
     async def pool_info(self, name: str) -> StoragePoolModel:
         return await self._client.get(f"/1.0/storage-pools/{name}")
 
     # PUT /1.0/storage-pools/{name} (sync)
-    async def update_pool(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.put(f"/1.0/storage-pools/{name}", json_body=body)
+    async def update_pool(self, name: str, body: StoragePoolModel) -> EmptySyncResponse:
+        return await self._client.put(
+            f"/1.0/storage-pools/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # PATCH /1.0/storage-pools/{name} (sync)
-    async def patch_pool(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.patch(f"/1.0/storage-pools/{name}", json_body=body)
+    async def patch_pool(self, name: str, body: StoragePoolModel) -> EmptySyncResponse:
+        return await self._client.patch(
+            f"/1.0/storage-pools/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # DELETE /1.0/storage-pools/{name} (sync)
     async def delete_pool(self, name: str) -> EmptySyncResponse:

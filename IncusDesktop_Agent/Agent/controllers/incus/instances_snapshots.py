@@ -16,10 +16,10 @@ class InstancesSnapshotsController:
         )
 
     # POST /1.0/instances/{name}/snapshots (async)
-    async def create_snapshot(self, name: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_snapshot(self, name: str, body: InstanceSnapshot, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/instances/{name}/snapshots",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -31,18 +31,18 @@ class InstancesSnapshotsController:
         )
 
     # PUT /1.0/instances/{name}/snapshots/{snapshot} (async)
-    async def update_snapshot(self, name: str, snapshot: str, body: dict, project: str = "default") -> OperationModel:
+    async def update_snapshot(self, name: str, snapshot: str, body: InstanceSnapshot, project: str = "default") -> OperationModel:
         return await self._client.put(
             f"/1.0/instances/{name}/snapshots/{snapshot}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/instances/{name}/snapshots/{snapshot} (sync)
-    async def patch_snapshot(self, name: str, snapshot: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_snapshot(self, name: str, snapshot: str, body: InstanceSnapshot, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/instances/{name}/snapshots/{snapshot}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

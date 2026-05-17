@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_pools import StoragePoolsController
+from Agent.models.storage_model import StoragePoolModel
 
 
 bp = Blueprint("storage_pools", __name__, url_prefix="/storage-pools")
@@ -19,7 +20,7 @@ async def list_pools():
 
 @bp.post("")
 async def create_pool():
-    body = request.get_json(force=True)
+    body = StoragePoolModel.model_validate(request.get_json(force=True))
     await _ctrl().create_pool(body=body)
     return "", 200
 
@@ -36,14 +37,14 @@ async def pool_info(name: str):
 
 @bp.put("/<name>")
 async def update_pool(name: str):
-    body = request.get_json(force=True)
+    body = StoragePoolModel.model_validate(request.get_json(force=True))
     await _ctrl().update_pool(name=name, body=body)
     return "", 200
 
 
 @bp.patch("/<name>")
 async def patch_pool(name: str):
-    body = request.get_json(force=True)
+    body = StoragePoolModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_pool(name=name, body=body)
     return "", 204
 

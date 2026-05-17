@@ -15,10 +15,10 @@ class NetworksForwardsController:
         )
 
     # POST /1.0/networks/{network}/forwards (sync)
-    async def create_forward(self, network: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_forward(self, network: str, body: NetworkForward, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             f"/1.0/networks/{network}/forwards",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworksForwardsController:
         )
 
     # PUT /1.0/networks/{network}/forwards/{listenAddress} (sync)
-    async def update_forward(self, network: str, listen_address: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_forward(self, network: str, listen_address: str, body: NetworkForward, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/networks/{network}/forwards/{listen_address}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/networks/{network}/forwards/{listenAddress} (sync)
-    async def patch_forward(self, network: str, listen_address: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_forward(self, network: str, listen_address: str, body: NetworkForward, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/networks/{network}/forwards/{listen_address}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

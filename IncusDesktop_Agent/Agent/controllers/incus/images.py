@@ -28,10 +28,10 @@ class ImagesController:
         return await self._client.get("/1.0/images", params=params)
 
     # POST /1.0/images (async, JSON)
-    async def create_image(self, body: dict, project: str = "default") -> OperationModel:
+    async def create_image(self, body: ImageModel, project: str = "default") -> OperationModel:
         return await self._client.post(
             "/1.0/images",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -52,18 +52,18 @@ class ImagesController:
         return await self._client.get(f"/1.0/images/{fingerprint}", params=params)
 
     # PUT /1.0/images/{fingerprint} (sync)
-    async def update_image(self, fingerprint: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_image(self, fingerprint: str, body: ImageModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/images/{fingerprint}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/images/{fingerprint} (sync)
-    async def patch_image(self, fingerprint: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_image(self, fingerprint: str, body: ImageModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/images/{fingerprint}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -86,10 +86,10 @@ class ImagesController:
         )
 
     # POST /1.0/images/{fingerprint}/export (async)
-    async def push_export_image(self, fingerprint: str, body: dict, project: str = "default") -> OperationModel:
+    async def push_export_image(self, fingerprint: str, body: ImageModel, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/images/{fingerprint}/export",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -115,10 +115,10 @@ class ImagesController:
         )
 
     # POST /1.0/images/aliases (sync)
-    async def create_alias(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_alias(self, body: ImageAliasModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/images/aliases",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -130,18 +130,18 @@ class ImagesController:
         return await self._client.get(f"/1.0/images/aliases/{name}", params=params)
 
     # PUT /1.0/images/aliases/{name} (sync)
-    async def update_alias(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_alias(self, name: str, body: ImageAliasModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/images/aliases/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/images/aliases/{name} (sync)
-    async def patch_alias(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_alias(self, name: str, body: ImageAliasModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/images/aliases/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

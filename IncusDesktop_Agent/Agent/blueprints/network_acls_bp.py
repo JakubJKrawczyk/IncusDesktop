@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.network_acls import NetworkACLsController
+from Agent.models.network_acl_model import NetworkACLModel
 
 
 bp = Blueprint("network_acls", __name__, url_prefix="/network-acls")
@@ -21,7 +22,7 @@ async def list_acls():
 @bp.post("")
 async def create_acl():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkACLModel.model_validate(request.get_json(force=True))
     await _ctrl().create_acl(body=body, project=project)
     return "", 200
 
@@ -42,7 +43,7 @@ async def acl_info(name: str):
 @bp.put("/<name>")
 async def update_acl(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkACLModel.model_validate(request.get_json(force=True))
     await _ctrl().update_acl(name=name, body=body, project=project)
     return "", 200
 
@@ -50,7 +51,7 @@ async def update_acl(name: str):
 @bp.patch("/<name>")
 async def patch_acl(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkACLModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_acl(name=name, body=body, project=project)
     return "", 204
 

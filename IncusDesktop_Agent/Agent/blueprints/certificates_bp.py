@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.certificates import CertificatesController
+from Agent.models.certificate_model import CertificateModel
 
 
 bp = Blueprint("certificates", __name__, url_prefix="/certificates")
@@ -21,7 +22,7 @@ async def list_certificates():
 @bp.post("")
 async def create_certificate():
     public = "public" in request.args
-    body = request.get_json(force=True)
+    body = CertificateModel.model_validate(request.get_json(force=True))
     await _ctrl().create_certificate(body=body, public=public)
     return "", 200
 
@@ -33,14 +34,14 @@ async def certificate_info(fingerprint: str):
 
 @bp.put("/<fingerprint>")
 async def update_certificate(fingerprint: str):
-    body = request.get_json(force=True)
+    body = CertificateModel.model_validate(request.get_json(force=True))
     await _ctrl().update_certificate(fingerprint=fingerprint, body=body)
     return "", 200
 
 
 @bp.patch("/<fingerprint>")
 async def patch_certificate(fingerprint: str):
-    body = request.get_json(force=True)
+    body = CertificateModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_certificate(fingerprint=fingerprint, body=body)
     return "", 204
 

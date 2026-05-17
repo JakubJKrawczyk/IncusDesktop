@@ -15,23 +15,33 @@ class CertificatesController:
         return await self._client.get("/1.0/certificates", params=params)
 
     # POST /1.0/certificates (sync)
-    async def create_certificate(self, body: dict, public: bool = False) -> EmptySyncResponse:
+    async def create_certificate(self, body: CertificateModel, public: bool = False) -> EmptySyncResponse:
         params: dict = {}
         if public:
             params["public"] = ""
-        return await self._client.post("/1.0/certificates", json_body=body, params=params or None)
+        return await self._client.post(
+            "/1.0/certificates",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+            params=params or None,
+        )
 
     # GET /1.0/certificates/{fingerprint} (sync)
     async def certificate_info(self, fingerprint: str) -> CertificateModel:
         return await self._client.get(f"/1.0/certificates/{fingerprint}")
 
     # PUT /1.0/certificates/{fingerprint} (sync)
-    async def update_certificate(self, fingerprint: str, body: dict) -> EmptySyncResponse:
-        return await self._client.put(f"/1.0/certificates/{fingerprint}", json_body=body)
+    async def update_certificate(self, fingerprint: str, body: CertificateModel) -> EmptySyncResponse:
+        return await self._client.put(
+            f"/1.0/certificates/{fingerprint}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # PATCH /1.0/certificates/{fingerprint} (sync)
-    async def patch_certificate(self, fingerprint: str, body: dict) -> EmptySyncResponse:
-        return await self._client.patch(f"/1.0/certificates/{fingerprint}", json_body=body)
+    async def patch_certificate(self, fingerprint: str, body: CertificateModel) -> EmptySyncResponse:
+        return await self._client.patch(
+            f"/1.0/certificates/{fingerprint}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # DELETE /1.0/certificates/{fingerprint} (sync)
     async def delete_certificate(self, fingerprint: str) -> EmptySyncResponse:

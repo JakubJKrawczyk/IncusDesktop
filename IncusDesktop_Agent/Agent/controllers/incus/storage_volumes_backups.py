@@ -15,10 +15,10 @@ class StorageVolumesBackupsController:
         )
 
     # POST .../volumes/{type}/{volume}/backups (async)
-    async def create_backup(self, pool: str, type: str, volume: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_backup(self, pool: str, type: str, volume: str, body: StorageVolumeBackup, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{volume}/backups",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

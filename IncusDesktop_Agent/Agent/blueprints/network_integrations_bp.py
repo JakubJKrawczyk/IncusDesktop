@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.network_integrations import NetworkIntegrationsController
+from Agent.models.network_integration_model import NetworkIntegrationModel
 
 
 bp = Blueprint("network_integrations", __name__, url_prefix="/network-integrations")
@@ -19,7 +20,7 @@ async def list_integrations():
 
 @bp.post("")
 async def create_integration():
-    body = request.get_json(force=True)
+    body = NetworkIntegrationModel.model_validate(request.get_json(force=True))
     await _ctrl().create_integration(body=body)
     return "", 200
 
@@ -31,14 +32,14 @@ async def integration_info(name: str):
 
 @bp.put("/<name>")
 async def update_integration(name: str):
-    body = request.get_json(force=True)
+    body = NetworkIntegrationModel.model_validate(request.get_json(force=True))
     await _ctrl().update_integration(name=name, body=body)
     return "", 200
 
 
 @bp.patch("/<name>")
 async def patch_integration(name: str):
-    body = request.get_json(force=True)
+    body = NetworkIntegrationModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_integration(name=name, body=body)
     return "", 204
 

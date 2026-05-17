@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.instances_backups import InstancesBackupsController
+from Agent.models.instance_model import InstanceBackup
 
 
 bp = Blueprint("instances_backups", __name__, url_prefix="/instances")
@@ -21,7 +22,7 @@ async def list_backups(name: str):
 @bp.post("/<name>/backups")
 async def create_backup(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceBackup.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_backup(name=name, body=body, project=project)), 202
 
 

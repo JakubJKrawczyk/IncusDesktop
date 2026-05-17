@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.profiles import ProfilesController
+from Agent.models.profile_model import ProfileModel
 
 
 bp = Blueprint("profiles", __name__, url_prefix="/profiles")
@@ -22,7 +23,7 @@ async def list_profiles():
 @bp.post("")
 async def create_profile():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ProfileModel.model_validate(request.get_json(force=True))
     await _ctrl().create_profile(body=body, project=project)
     return "", 200
 
@@ -36,7 +37,7 @@ async def profile_info(name: str):
 @bp.put("/<name>")
 async def update_profile(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ProfileModel.model_validate(request.get_json(force=True))
     await _ctrl().update_profile(name=name, body=body, project=project)
     return "", 200
 
@@ -44,7 +45,7 @@ async def update_profile(name: str):
 @bp.patch("/<name>")
 async def patch_profile(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ProfileModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_profile(name=name, body=body, project=project)
     return "", 204
 

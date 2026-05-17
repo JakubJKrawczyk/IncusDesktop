@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.storage_volumes_backups import StorageVolumesBackupsController
+from Agent.models.storage_model import StorageVolumeBackup
 
 
 bp = Blueprint("storage_volumes_backups", __name__, url_prefix="/storage-pools")
@@ -21,7 +22,7 @@ async def list_backups(pool: str, type: str, volume: str):
 @bp.post("/<pool>/volumes/<type>/<volume>/backups")
 async def create_backup(pool: str, type: str, volume: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeBackup.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_backup(pool=pool, type=type, volume=volume, body=body, project=project)), 202
 
 

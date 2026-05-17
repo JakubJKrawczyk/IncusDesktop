@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request, Response
 
 from Agent.controllers.incus.images import ImagesController
+from Agent.models.image_model import ImageAliasModel, ImageModel
 
 
 bp = Blueprint("images", __name__, url_prefix="/images")
@@ -27,7 +28,7 @@ async def list_aliases():
 @bp.post("/aliases")
 async def create_alias():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageAliasModel.model_validate(request.get_json(force=True))
     await _ctrl().create_alias(body=body, project=project)
     return "", 200
 
@@ -42,7 +43,7 @@ async def alias_info(name: str):
 @bp.put("/aliases/<name>")
 async def update_alias(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageAliasModel.model_validate(request.get_json(force=True))
     await _ctrl().update_alias(name=name, body=body, project=project)
     return "", 200
 
@@ -50,7 +51,7 @@ async def update_alias(name: str):
 @bp.patch("/aliases/<name>")
 async def patch_alias(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageAliasModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_alias(name=name, body=body, project=project)
     return "", 204
 
@@ -90,7 +91,7 @@ async def create_or_upload_image():
     project = request.args.get("project", "default")
     content_type = (request.content_type or "").lower()
     if content_type.startswith("application/json"):
-        body = request.get_json(force=True)
+        body = ImageModel.model_validate(request.get_json(force=True))
         return jsonify(await _ctrl().create_image(body=body, project=project)), 202
     headers = _extract_incus_headers()
     return jsonify(await _ctrl().upload_image(
@@ -110,7 +111,7 @@ async def image_info(fingerprint: str):
 @bp.put("/<fingerprint>")
 async def update_image(fingerprint: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageModel.model_validate(request.get_json(force=True))
     await _ctrl().update_image(fingerprint=fingerprint, body=body, project=project)
     return "", 200
 
@@ -118,7 +119,7 @@ async def update_image(fingerprint: str):
 @bp.patch("/<fingerprint>")
 async def patch_image(fingerprint: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_image(fingerprint=fingerprint, body=body, project=project)
     return "", 204
 
@@ -140,7 +141,7 @@ async def export_image(fingerprint: str):
 @bp.post("/<fingerprint>/export")
 async def push_export_image(fingerprint: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = ImageModel.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().push_export_image(fingerprint=fingerprint, body=body, project=project)), 202
 
 

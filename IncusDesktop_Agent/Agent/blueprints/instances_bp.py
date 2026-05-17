@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.instances import InstancesController
+from Agent.models.instance_model import InstanceModel
 
 
 bp = Blueprint("instances", __name__, url_prefix="/instances")
@@ -21,14 +22,15 @@ async def list_instances():
 @bp.post("")
 async def create_instance():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceModel.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_instance(body=body, project=project)), 202
 
 
 @bp.put("")
 async def bulk_update_instances():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    raw = request.get_json(force=True)
+    body = [InstanceModel.model_validate(item) for item in raw]
     return jsonify(await _ctrl().bulk_update_instances(body=body, project=project)), 202
 
 
@@ -41,14 +43,14 @@ async def instance_info(name: str):
 @bp.put("/<name>")
 async def update_instance(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceModel.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().update_instance(name=name, body=body, project=project)), 202
 
 
 @bp.patch("/<name>")
 async def patch_instance(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_instance(name=name, body=body, project=project)
     return "", 204
 

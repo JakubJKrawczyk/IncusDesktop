@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_buckets_keys import StorageBucketsKeysController
+from Agent.models.storage_model import StorageBucketKey
 
 
 bp = Blueprint("storage_buckets_keys", __name__, url_prefix="/storage-pools")
@@ -21,7 +22,7 @@ async def list_keys(pool: str, bucket: str):
 @bp.post("/<pool>/buckets/<bucket>/keys")
 async def create_key(pool: str, bucket: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketKey.model_validate(request.get_json(force=True))
     await _ctrl().create_key(pool=pool, bucket=bucket, body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def key_info(pool: str, bucket: str, key: str):
 @bp.put("/<pool>/buckets/<bucket>/keys/<key>")
 async def update_key(pool: str, bucket: str, key: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketKey.model_validate(request.get_json(force=True))
     await _ctrl().update_key(pool=pool, bucket=bucket, key=key, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_key(pool: str, bucket: str, key: str):
 @bp.patch("/<pool>/buckets/<bucket>/keys/<key>")
 async def patch_key(pool: str, bucket: str, key: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketKey.model_validate(request.get_json(force=True))
     await _ctrl().patch_key(pool=pool, bucket=bucket, key=key, body=body, project=project)
     return "", 204
 

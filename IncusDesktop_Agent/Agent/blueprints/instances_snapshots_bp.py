@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.instances_snapshots import InstancesSnapshotsController
+from Agent.models.instance_model import InstanceSnapshot
 
 
 bp = Blueprint("instances_snapshots", __name__, url_prefix="/instances")
@@ -21,7 +22,7 @@ async def list_snapshots(name: str):
 @bp.post("/<name>/snapshots")
 async def create_snapshot(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceSnapshot.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_snapshot(name=name, body=body, project=project)), 202
 
 
@@ -34,14 +35,14 @@ async def snapshot_info(name: str, snapshot: str):
 @bp.put("/<name>/snapshots/<snapshot>")
 async def update_snapshot(name: str, snapshot: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceSnapshot.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().update_snapshot(name=name, snapshot=snapshot, body=body, project=project)), 202
 
 
 @bp.patch("/<name>/snapshots/<snapshot>")
 async def patch_snapshot(name: str, snapshot: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = InstanceSnapshot.model_validate(request.get_json(force=True))
     await _ctrl().patch_snapshot(name=name, snapshot=snapshot, body=body, project=project)
     return "", 204
 

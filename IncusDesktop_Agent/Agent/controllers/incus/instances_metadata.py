@@ -15,18 +15,18 @@ class InstancesMetadataController:
         )
 
     # PUT /1.0/instances/{name}/metadata (sync)
-    async def update_metadata(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_metadata(self, name: str, body: InstanceMetadata, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/instances/{name}/metadata",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/instances/{name}/metadata (sync)
-    async def patch_metadata(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_metadata(self, name: str, body: InstanceMetadata, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/instances/{name}/metadata",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

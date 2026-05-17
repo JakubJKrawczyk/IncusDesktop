@@ -17,20 +17,29 @@ class ProjectsController:
         )
 
     # POST /1.0/projects (sync)
-    async def create_project(self, body: dict) -> EmptySyncResponse:
-        return await self._client.post("/1.0/projects", json_body=body)
+    async def create_project(self, body: ProjectModel) -> EmptySyncResponse:
+        return await self._client.post(
+            "/1.0/projects",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # GET /1.0/projects/{name} (sync)
     async def project_info(self, name: str) -> ProjectModel:
         return await self._client.get(f"/1.0/projects/{name}")
 
     # PUT /1.0/projects/{name} (sync)
-    async def update_project(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.put(f"/1.0/projects/{name}", json_body=body)
+    async def update_project(self, name: str, body: ProjectModel) -> EmptySyncResponse:
+        return await self._client.put(
+            f"/1.0/projects/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # PATCH /1.0/projects/{name} (sync)
-    async def patch_project(self, name: str, body: dict) -> EmptySyncResponse:
-        return await self._client.patch(f"/1.0/projects/{name}", json_body=body)
+    async def patch_project(self, name: str, body: ProjectModel) -> EmptySyncResponse:
+        return await self._client.patch(
+            f"/1.0/projects/{name}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # POST /1.0/projects/{name} (async, rename)
     async def rename_project(self, name: str, new_name: str) -> OperationModel:

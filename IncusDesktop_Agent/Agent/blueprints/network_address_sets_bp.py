@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.network_address_sets import NetworkAddressSetsController
+from Agent.models.network_address_set_model import NetworkAddressSetModel
 
 
 bp = Blueprint("network_address_sets", __name__, url_prefix="/network-address-sets")
@@ -21,7 +22,7 @@ async def list_address_sets():
 @bp.post("")
 async def create_address_set():
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkAddressSetModel.model_validate(request.get_json(force=True))
     await _ctrl().create_address_set(body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def address_set_info(name: str):
 @bp.put("/<name>")
 async def update_address_set(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkAddressSetModel.model_validate(request.get_json(force=True))
     await _ctrl().update_address_set(name=name, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_address_set(name: str):
 @bp.patch("/<name>")
 async def patch_address_set(name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkAddressSetModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_address_set(name=name, body=body, project=project)
     return "", 204
 

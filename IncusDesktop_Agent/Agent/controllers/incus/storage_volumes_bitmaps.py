@@ -15,10 +15,10 @@ class StorageVolumesBitmapsController:
         )
 
     # POST .../volumes/{type}/{volume}/bitmaps (async)
-    async def create_bitmap(self, pool: str, type: str, volume: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_bitmap(self, pool: str, type: str, volume: str, body: StorageVolumeBitmap, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/volumes/{type}/{volume}/bitmaps",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

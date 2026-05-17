@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.network_zones_records import NetworkZonesRecordsController
+from Agent.models.network_zone_model import NetworkZoneRecordModel
 
 
 bp = Blueprint("network_zones_records", __name__, url_prefix="/network-zones")
@@ -21,7 +22,7 @@ async def list_records(zone: str):
 @bp.post("/<zone>/records")
 async def create_record(zone: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneRecordModel.model_validate(request.get_json(force=True))
     await _ctrl().create_record(zone=zone, body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def record_info(zone: str, name: str):
 @bp.put("/<zone>/records/<name>")
 async def update_record(zone: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneRecordModel.model_validate(request.get_json(force=True))
     await _ctrl().update_record(zone=zone, name=name, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_record(zone: str, name: str):
 @bp.patch("/<zone>/records/<name>")
 async def patch_record(zone: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkZoneRecordModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_record(zone=zone, name=name, body=body, project=project)
     return "", 204
 

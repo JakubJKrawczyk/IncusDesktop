@@ -20,12 +20,18 @@ class ServerController:
         return await self._client.get("/1.0", params=params or None)
 
     # PUT /1.0 (sync)
-    async def update_server(self, body: dict) -> EmptySyncResponse:
-        return await self._client.put("/1.0", json_body=body)
+    async def update_server(self, body: ServerModel) -> EmptySyncResponse:
+        return await self._client.put(
+            "/1.0",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # PATCH /1.0 (sync)
-    async def patch_server(self, body: dict) -> EmptySyncResponse:
-        return await self._client.patch("/1.0", json_body=body)
+    async def patch_server(self, body: ServerModel) -> EmptySyncResponse:
+        return await self._client.patch(
+            "/1.0",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # GET /1.0/events (WebSocket - placeholder 501)
     async def events_stream(self, type: str | None = None, project: str | None = None):

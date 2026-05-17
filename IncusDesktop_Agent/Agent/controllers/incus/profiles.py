@@ -20,10 +20,10 @@ class ProfilesController:
         )
 
     # POST /1.0/profiles (sync)
-    async def create_profile(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_profile(self, body: ProfileModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/profiles",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -35,18 +35,18 @@ class ProfilesController:
         )
 
     # PUT /1.0/profiles/{name} (sync)
-    async def update_profile(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_profile(self, name: str, body: ProfileModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/profiles/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/profiles/{name} (sync)
-    async def patch_profile(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_profile(self, name: str, body: ProfileModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/profiles/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

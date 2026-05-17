@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.cluster import ClusterController
+from Agent.models.cluster_model import ClusterGroup, ClusterInfo, ClusterMember
 
 
 bp = Blueprint("cluster", __name__, url_prefix="/cluster")
@@ -18,13 +19,13 @@ async def cluster_info():
 
 @bp.put("")
 async def update_cluster():
-    body = request.get_json(force=True)
+    body = ClusterInfo.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().update_cluster(body=body)), 202
 
 
 @bp.put("/certificate")
 async def cluster_certificate():
-    body = request.get_json(force=True)
+    body = ClusterInfo.model_validate(request.get_json(force=True))
     await _ctrl().cluster_certificate(body=body)
     return "", 200
 
@@ -39,7 +40,7 @@ async def list_groups():
 
 @bp.post("/groups")
 async def create_group():
-    body = request.get_json(force=True)
+    body = ClusterGroup.model_validate(request.get_json(force=True))
     await _ctrl().create_group(body=body)
     return "", 200
 
@@ -51,14 +52,14 @@ async def group_info(name: str):
 
 @bp.put("/groups/<name>")
 async def update_group(name: str):
-    body = request.get_json(force=True)
+    body = ClusterGroup.model_validate(request.get_json(force=True))
     await _ctrl().update_group(name=name, body=body)
     return "", 200
 
 
 @bp.patch("/groups/<name>")
 async def patch_group(name: str):
-    body = request.get_json(force=True)
+    body = ClusterGroup.model_validate(request.get_json(force=True))
     await _ctrl().patch_group(name=name, body=body)
     return "", 204
 
@@ -86,7 +87,7 @@ async def list_members():
 
 @bp.post("/members")
 async def request_join_token():
-    body = request.get_json(force=True)
+    body = ClusterMember.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().request_join_token(body=body)), 202
 
 
@@ -98,7 +99,7 @@ async def member_state(name: str):
 @bp.post("/members/<name>/state")
 async def member_state_action(name: str):
     body = request.get_json(force=True)
-    return jsonify(await _ctrl().member_state_action(name=name, body=body)), 202
+    return jsonify(await _ctrl().member_state_action(name=name, action=body["action"])), 202
 
 
 @bp.get("/members/<name>")
@@ -108,14 +109,14 @@ async def member_info(name: str):
 
 @bp.put("/members/<name>")
 async def update_member(name: str):
-    body = request.get_json(force=True)
+    body = ClusterMember.model_validate(request.get_json(force=True))
     await _ctrl().update_member(name=name, body=body)
     return "", 200
 
 
 @bp.patch("/members/<name>")
 async def patch_member(name: str):
-    body = request.get_json(force=True)
+    body = ClusterMember.model_validate(request.get_json(force=True))
     await _ctrl().patch_member(name=name, body=body)
     return "", 204
 

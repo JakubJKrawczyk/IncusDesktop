@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.networks_load_balancers import NetworksLoadBalancersController
+from Agent.models.network_model import NetworkLoadBalancer
 
 
 bp = Blueprint("networks_load_balancers", __name__, url_prefix="/networks")
@@ -21,7 +22,7 @@ async def list_load_balancers(network: str):
 @bp.post("/<network>/load-balancers")
 async def create_load_balancer(network: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkLoadBalancer.model_validate(request.get_json(force=True))
     await _ctrl().create_load_balancer(network=network, body=body, project=project)
     return "", 200
 
@@ -41,7 +42,7 @@ async def load_balancer_info(network: str, listen_address: str):
 @bp.put("/<network>/load-balancers/<listen_address>")
 async def update_load_balancer(network: str, listen_address: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkLoadBalancer.model_validate(request.get_json(force=True))
     await _ctrl().update_load_balancer(network=network, listen_address=listen_address, body=body, project=project)
     return "", 200
 
@@ -49,7 +50,7 @@ async def update_load_balancer(network: str, listen_address: str):
 @bp.patch("/<network>/load-balancers/<listen_address>")
 async def patch_load_balancer(network: str, listen_address: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = NetworkLoadBalancer.model_validate(request.get_json(force=True))
     await _ctrl().patch_load_balancer(network=network, listen_address=listen_address, body=body, project=project)
     return "", 204
 

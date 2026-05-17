@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.projects import ProjectsController
+from Agent.models.project_model import ProjectModel
 
 
 bp = Blueprint("projects", __name__, url_prefix="/projects")
@@ -20,7 +21,7 @@ async def list_projects():
 
 @bp.post("")
 async def create_project():
-    body = request.get_json(force=True)
+    body = ProjectModel.model_validate(request.get_json(force=True))
     await _ctrl().create_project(body=body)
     return "", 200
 
@@ -32,14 +33,14 @@ async def project_info(name: str):
 
 @bp.put("/<name>")
 async def update_project(name: str):
-    body = request.get_json(force=True)
+    body = ProjectModel.model_validate(request.get_json(force=True))
     await _ctrl().update_project(name=name, body=body)
     return "", 200
 
 
 @bp.patch("/<name>")
 async def patch_project(name: str):
-    body = request.get_json(force=True)
+    body = ProjectModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_project(name=name, body=body)
     return "", 204
 

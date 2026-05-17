@@ -15,10 +15,10 @@ class NetworkAddressSetsController:
         )
 
     # POST /1.0/network-address-sets (sync)
-    async def create_address_set(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_address_set(self, body: NetworkAddressSetModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/network-address-sets",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworkAddressSetsController:
         )
 
     # PUT /1.0/network-address-sets/{name} (sync)
-    async def update_address_set(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_address_set(self, name: str, body: NetworkAddressSetModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/network-address-sets/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/network-address-sets/{name} (sync)
-    async def patch_address_set(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_address_set(self, name: str, body: NetworkAddressSetModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/network-address-sets/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

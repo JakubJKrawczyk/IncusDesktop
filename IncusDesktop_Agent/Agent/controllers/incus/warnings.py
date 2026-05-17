@@ -19,8 +19,11 @@ class WarningsController:
         return await self._client.get(f"/1.0/warnings/{uuid}")
 
     # PUT /1.0/warnings/{uuid} (sync)
-    async def update_warning(self, uuid: str, body: dict) -> EmptySyncResponse:
-        return await self._client.put(f"/1.0/warnings/{uuid}", json_body=body)
+    async def update_warning(self, uuid: str, body: WarningModel) -> EmptySyncResponse:
+        return await self._client.put(
+            f"/1.0/warnings/{uuid}",
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
+        )
 
     # DELETE /1.0/warnings/{uuid} (sync)
     async def delete_warning(self, uuid: str) -> EmptySyncResponse:

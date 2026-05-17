@@ -15,10 +15,10 @@ class StorageBucketsBackupsController:
         )
 
     # POST .../buckets/{bucket}/backups (async)
-    async def create_backup(self, pool: str, bucket: str, body: dict, project: str = "default") -> OperationModel:
+    async def create_backup(self, pool: str, bucket: str, body: StorageBucketBackup, project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/storage-pools/{pool}/buckets/{bucket}/backups",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 

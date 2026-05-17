@@ -4,6 +4,8 @@ from Agent.controllers.agent.scenarios import _helpers
 from Agent.controllers.agent.scenarios._runner import ScenarioRunner
 from Agent.controllers.incus.profiles import ProfilesController
 from Agent.controllers.incus.projects import ProjectsController
+from Agent.models.profile_model import ProfileModel
+from Agent.models.project_model import ProjectModel
 from Agent.models.scenarios.host import HostBootstrapSpec, ProjectBootstrapSpec
 from Agent.models.scenarios.runs import ScenarioRun
 from Agent.utility.rest_client import IncusError, IncusRestClient
@@ -60,7 +62,7 @@ class HostSetupScenarios:
                 }
                 await self._profiles.patch_profile(
                     name="default",
-                    body={"devices": devices_patch},
+                    body=ProfileModel(devices=devices_patch),
                     project="default",
                 )
                 step.detail["devices"] = list(devices_patch.keys())
@@ -82,9 +84,11 @@ class HostSetupScenarios:
                 await self._projects.project_info(spec.name)
                 step.detail["existed"] = True
             except IncusError:
-                body: dict[str, Any] = {"name": spec.name, "config": spec.config}
-                if spec.description:
-                    body["description"] = spec.description
+                body = ProjectModel(
+                    name=spec.name,
+                    config=spec.config,
+                    description=spec.description,
+                )
                 await self._projects.create_project(body=body)
                 step.detail["existed"] = False
             step.detail["project"] = spec.name

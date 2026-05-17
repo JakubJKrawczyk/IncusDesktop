@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.warnings import WarningsController
+from Agent.models.warning_model import WarningModel
 
 
 bp = Blueprint("warnings", __name__, url_prefix="/warnings")
@@ -25,7 +26,7 @@ async def warning_info(uuid: str):
 
 @bp.put("/<uuid>")
 async def update_warning(uuid: str):
-    body = request.get_json(force=True)
+    body = WarningModel.model_validate(request.get_json(force=True))
     await _ctrl().update_warning(uuid=uuid, body=body)
     return "", 200
 

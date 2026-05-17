@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_volumes_bitmaps import StorageVolumesBitmapsController
+from Agent.models.storage_model import StorageVolumeBitmap
 
 
 bp = Blueprint("storage_volumes_bitmaps", __name__, url_prefix="/storage-pools")
@@ -21,7 +22,7 @@ async def list_bitmaps(pool: str, type: str, volume: str):
 @bp.post("/<pool>/volumes/<type>/<volume>/bitmaps")
 async def create_bitmap(pool: str, type: str, volume: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageVolumeBitmap.model_validate(request.get_json(force=True))
     return jsonify(await _ctrl().create_bitmap(pool=pool, type=type, volume=volume, body=body, project=project)), 202
 
 

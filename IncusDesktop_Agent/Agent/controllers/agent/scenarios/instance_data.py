@@ -6,6 +6,7 @@ from Agent.controllers.agent.scenarios._runner import ScenarioRunner
 from Agent.controllers.incus.instances import InstancesController
 from Agent.controllers.incus.instances_backups import InstancesBackupsController
 from Agent.controllers.incus.instances_snapshots import InstancesSnapshotsController
+from Agent.models.instance_model import InstanceBackup, InstanceSnapshot
 from Agent.models.scenarios.instance import (
     BackupExportSpec,
     RestoreFromBackupSpec,
@@ -34,10 +35,14 @@ class InstanceDataScenarios:
         runner = ScenarioRunner("instance.snapshot", target=spec.instance)
 
         async with runner.step("create_snapshot") as step:
-            body: dict[str, Any] = {"name": snap_name, "stateful": spec.stateful}
+            body_dict: dict[str, Any] = {"name": snap_name, "stateful": spec.stateful}
             if spec.expires_at:
-                body["expires_at"] = spec.expires_at
-            await self._snapshots.create_snapshot(spec.instance, body=body, project=spec.project)
+                body_dict["expires_at"] = spec.expires_at
+            await self._snapshots.create_snapshot(
+                spec.instance,
+                body=InstanceSnapshot.model_validate(body_dict),
+                project=spec.project,
+            )
             step.detail["snapshot"] = snap_name
             step.detail["stateful"] = spec.stateful
 
@@ -67,14 +72,18 @@ class InstanceDataScenarios:
         runner = ScenarioRunner("instance.backup_export", target=spec.instance)
 
         async with runner.step("create_backup") as step:
-            body: dict[str, Any] = {
+            body_dict: dict[str, Any] = {
                 "name": backup_name,
                 "instance_only": spec.instance_only,
                 "optimized_storage": spec.optimized_storage,
             }
             if spec.compression_algorithm:
-                body["compression_algorithm"] = spec.compression_algorithm
-            await self._backups.create_backup(spec.instance, body=body, project=spec.project)
+                body_dict["compression_algorithm"] = spec.compression_algorithm
+            await self._backups.create_backup(
+                spec.instance,
+                body=InstanceBackup.model_validate(body_dict),
+                project=spec.project,
+            )
             step.detail["backup"] = backup_name
 
         export_url = (

@@ -2,6 +2,7 @@
 from flask import Blueprint, current_app, jsonify, request
 
 from Agent.controllers.incus.storage_buckets import StorageBucketsController
+from Agent.models.storage_model import StorageBucketModel
 
 
 bp = Blueprint("storage_buckets", __name__, url_prefix="/storage-pools")
@@ -21,7 +22,7 @@ async def list_buckets(pool: str):
 @bp.post("/<pool>/buckets")
 async def create_bucket(pool: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketModel.model_validate(request.get_json(force=True))
     await _ctrl().create_bucket(pool=pool, body=body, project=project)
     return "", 200
 
@@ -35,7 +36,7 @@ async def bucket_info(pool: str, name: str):
 @bp.put("/<pool>/buckets/<name>")
 async def update_bucket(pool: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketModel.model_validate(request.get_json(force=True))
     await _ctrl().update_bucket(pool=pool, name=name, body=body, project=project)
     return "", 200
 
@@ -43,7 +44,7 @@ async def update_bucket(pool: str, name: str):
 @bp.patch("/<pool>/buckets/<name>")
 async def patch_bucket(pool: str, name: str):
     project = request.args.get("project", "default")
-    body = request.get_json(force=True)
+    body = StorageBucketModel.model_validate(request.get_json(force=True))
     await _ctrl().patch_bucket(pool=pool, name=name, body=body, project=project)
     return "", 204
 

@@ -1,3 +1,5 @@
+from typing import Any
+
 from Agent.models.emptySyncRepo_model import EmptySyncResponse
 from Agent.models.instance_model import InstanceModel, InstanceState
 from Agent.models.operation_model import OperationModel
@@ -17,18 +19,18 @@ class InstancesController:
         )
 
     # POST /1.0/instances (async)
-    async def create_instance(self, body: dict, project: str = "default") -> OperationModel:
+    async def create_instance(self, body: InstanceModel, project: str = "default") -> OperationModel:
         return await self._client.post(
             "/1.0/instances",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PUT /1.0/instances (async)
-    async def bulk_update_instances(self, body: dict, project: str = "default") -> OperationModel:
+    async def bulk_update_instances(self, body: list[InstanceModel], project: str = "default") -> OperationModel:
         return await self._client.put(
             "/1.0/instances",
-            json_body=body,
+            json_body=[i.model_dump(exclude_none=True, by_alias=True) for i in body],
             params={"project": project},
         )
 
@@ -40,18 +42,18 @@ class InstancesController:
         )
 
     # PUT /1.0/instances/{name} (async)
-    async def update_instance(self, name: str, body: dict, project: str = "default") -> OperationModel:
+    async def update_instance(self, name: str, body: InstanceModel, project: str = "default") -> OperationModel:
         return await self._client.put(
             f"/1.0/instances/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/instances/{name} (sync)
-    async def patch_instance(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_instance(self, name: str, body: InstanceModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/instances/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -106,7 +108,7 @@ class InstancesController:
         )
 
     # POST /1.0/instances/{name}/rebuild (async)
-    async def rebuild_instance(self, name: str, source: dict, project: str = "default") -> OperationModel:
+    async def rebuild_instance(self, name: str, source: dict[str, Any], project: str = "default") -> OperationModel:
         return await self._client.post(
             f"/1.0/instances/{name}/rebuild",
             json_body={"source": source},

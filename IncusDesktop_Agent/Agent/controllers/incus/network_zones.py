@@ -15,10 +15,10 @@ class NetworkZonesController:
         )
 
     # POST /1.0/network-zones (sync)
-    async def create_zone(self, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def create_zone(self, body: NetworkZoneModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.post(
             "/1.0/network-zones",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
@@ -30,18 +30,18 @@ class NetworkZonesController:
         )
 
     # PUT /1.0/network-zones/{name} (sync)
-    async def update_zone(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def update_zone(self, name: str, body: NetworkZoneModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.put(
             f"/1.0/network-zones/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
     # PATCH /1.0/network-zones/{name} (sync)
-    async def patch_zone(self, name: str, body: dict, project: str = "default") -> EmptySyncResponse:
+    async def patch_zone(self, name: str, body: NetworkZoneModel, project: str = "default") -> EmptySyncResponse:
         return await self._client.patch(
             f"/1.0/network-zones/{name}",
-            json_body=body,
+            json_body=body.model_dump(exclude_none=True, by_alias=True),
             params={"project": project},
         )
 
