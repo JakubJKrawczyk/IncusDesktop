@@ -4,7 +4,13 @@ import docker
 import requests
 
 from Utilities.consts import Tests
+from tests.utility.Helpers import TestsHelper
 
+
+@pytest.fixture(scope="session")
+def OneTimeSetup():
+    #check if test incus instance is live
+    TestsHelper.check_test_instance_connection()
 
 @pytest.fixture(scope="session")
 def base_url():
