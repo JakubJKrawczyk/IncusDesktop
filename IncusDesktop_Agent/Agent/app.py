@@ -1,6 +1,7 @@
 # app.py
 import asyncio
 import os
+import traceback
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -9,6 +10,7 @@ import atexit
 
 from flask import Flask, jsonify
 
+from Agent.exceptions import AgentError, IncusUnavailableError
 from Agent.blueprints.instances_bp import bp as instances_bp
 from Agent.blueprints.instancesExec_bp import bp as instances_exec_bp
 from Agent.blueprints.instances_snapshots_bp import bp as instances_snapshots_bp
@@ -61,11 +63,31 @@ def create_app() -> Flask:
 
     @app.before_request
     def check_requirements():
-        is_dev =os.getenv("DEVELOPER_MODE")
+        is_dev = os.getenv("DEVELOPER_MODE")
 
         if not Path(IncusRestClient.DEFAULT_SOCKET).exists() and not is_dev:
-            return jsonify({"Error": "Incus is not installed and default unix socket file was not found. Install incus then run api again."}), 503
+            raise IncusUnavailableError(
+                "Incus is not installed or its unix socket is missing.",
+                details={"socket": IncusRestClient.DEFAULT_SOCKET},
+                user_action="Install Incus and start the incus service, then retry.",
+            )
         return None
+
+    @app.errorhandler(AgentError)
+    def handle_agent_error(exc: AgentError):
+        # Structured envelope consumed by the GUI. See Agent/exceptions.py.
+        return jsonify(exc.to_dict()), exc.status
+
+    @app.errorhandler(Exception)
+    def handle_unexpected_error(exc: Exception):
+        # Catch-all: never leak a Flask HTML stack trace to the GUI.
+        # Logged with full traceback; the client sees a generic AgentError envelope.
+        app.logger.error("Unhandled exception: %s\n%s", exc, traceback.format_exc())
+        wrapped = AgentError(
+            "An unexpected error occurred on the agent.",
+            details={"exception_type": type(exc).__name__},
+        )
+        return jsonify(wrapped.to_dict()), wrapped.status
 
     app.extensions["incus"] = client
 
