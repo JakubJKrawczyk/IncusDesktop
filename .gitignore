@@ -1,7 +1,7 @@
 IncusDesktop_App/obj
 IncusDesktop_App/bin
 IncusDesktop_App/.idea
-IncusDesktop_Agent/.claude
+.claude/
 IncusDesktop_Agent/claude_ws
 *__pycache__*
 *egg-info*

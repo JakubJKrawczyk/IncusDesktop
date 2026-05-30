@@ -50,8 +50,6 @@ from Agent.blueprints.scenarios.host_bp import bp as scenarios_host_bp
 from Agent.blueprints.scenarios.dashboard_bp import bp as scenarios_dashboard_bp
 from Agent.blueprints.scenarios.runs_bp import bp as scenarios_runs_bp
 
-from Agent.blueprints.rawCommands.examples_bp import bp as raw_examples_bp
-
 from Agent.utility.rest_client import IncusRestClient
 
 
@@ -130,9 +128,6 @@ def create_app() -> Flask:
     app.register_blueprint(scenarios_host_bp)
     app.register_blueprint(scenarios_dashboard_bp)
     app.register_blueprint(scenarios_runs_bp)
-
-    # rawCommands (host shell-out)
-    app.register_blueprint(raw_examples_bp)
 
     atexit.register(lambda: asyncio.run(client.close()))
 
