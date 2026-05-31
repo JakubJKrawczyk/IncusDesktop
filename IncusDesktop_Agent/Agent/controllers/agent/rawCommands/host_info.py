@@ -19,6 +19,7 @@ from Agent.controllers.agent.rawCommands._executor import CommandResult, run
 from Utilities import consts
 from Utilities.logger import Logger, LoggLevel
 from Agent.exceptions import CommandFailedError, CommandTimeoutError
+from general.helpers import GlobalHelpers
 
 
 logger = Logger("[RAW.HOST_INFO]", consts.ConfigVariables.DEFAULT_LOGS_INCUS.value)
@@ -26,41 +27,50 @@ logger = Logger("[RAW.HOST_INFO]", consts.ConfigVariables.DEFAULT_LOGS_INCUS.val
 
 class HostInfoController:
 
+    @staticmethod
+    async def cat(path: str, timeout: float = 5):
+        return (await run(["cat", path], timeout= timeout)).stdout
 
     async def cpu(self):
         """CPU info: model, cores, threads, clock, per-core %, loadavg.
         Sources: /proc/stat, /proc/cpuinfo, /proc/loadavg."""
 
-        results = await run(["cat", "/proc/stat", "|", "grep", "cpu"], timeout=5)
+        stat = (await run(["cat", "/proc/stat", "|", "grep", "cpu"], timeout=5)).stdout
+        cpu_info = await HostInfoController.cat("/proc/cpuinfo")
+        loadavg = await HostInfoController.cat("/proc/loadavg")
 
-        if results.stderr is None:
-            return results.stdout
-        else:
-            raise CommandFailedError("")
+        stat_table = GlobalHelpers.StrHelper.parse_table(stat)
+        cpu_info_table = GlobalHelpers.StrHelper.parse_table(cpu_info)
+        loadavg_table = GlobalHelpers.StrHelper.parse_table(loadavg)
+
+
         return
 
     async def Memory(self):
         """RAM + swap: total/available/used/free/cached/buffers, swap*.
         Source: /proc/meminfo. Optionally top-N processes by RSS."""
-        pass
+        return await run(["cat", "/proc/meminfo"], timeout=5)
 
     async def Disk(self):
         """Block devices + mounts: model, size, type (HDD/SSD/NVMe),
         per-mount used/free/fs/mountpoint. Incus storage pools listed
         in a separate section. Sources: lsblk -J, df, incus storage list."""
-        pass
+        return await run(["df", "-h"], timeout=5)
 
     async def Network(self):
         """Network interfaces: per-iface rx/tx, errors, MTU, state,
         MAC, IPv4/v6. Incus bridges (incusbr0 etc.) in a separate section.
         Sources: /proc/net/dev, ip -j addr, ip -j link."""
-        pass
+        return (await run(["ip", "-j", "link"], timeout=5)).stdout
 
     async def Uptime(self):
         """Host uptime + OS info + kernel + hostname + arch.
         Sources: /proc/uptime, /etc/os-release, uname.
         Used mainly by the 'About this host' panel in the GUI."""
-        pass
+        uptime = (await run(["/proc/uptime"], timeout=5)).stdout
+
+
+        return
 
     async def Services(self):
         """Status of whitelisted systemd units (incus, incus-startup,

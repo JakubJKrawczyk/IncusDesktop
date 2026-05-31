@@ -2541,8 +2541,8 @@ definitions:
                 type: string
                 x-go-name: Netmask
             scope:
-                description: Address scope (local, link or global)
-                example: global
+                description: Address scope (local, link or general)
+                example: general
                 type: string
                 x-go-name: Scope
         type: object
@@ -2801,7 +2801,7 @@ definitions:
                 x-go-name: LongDescription
             scope:
                 description: Scope defines if option apply to cluster or to the local server
-                example: global
+                example: general
                 type: string
                 x-go-name: Scope
             shortdesc:
@@ -3839,7 +3839,7 @@ definitions:
                 x-go-name: Netmask
             scope:
                 description: Address scope
-                example: global
+                example: general
                 type: string
                 x-go-name: Scope
         type: object

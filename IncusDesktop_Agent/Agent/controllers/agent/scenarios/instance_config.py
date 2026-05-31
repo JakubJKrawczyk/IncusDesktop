@@ -321,7 +321,7 @@ def _first_global_ipv4(state: Any) -> str | None:
         for addr in iface.get("addresses", []) or []:
             if not isinstance(addr, dict):
                 continue
-            if addr.get("family") == "inet" and addr.get("scope") == "global":
+            if addr.get("family") == "inet" and addr.get("scope") == "general":
                 return addr.get("address")
     return None
 

@@ -301,7 +301,7 @@ def _state_has_nonlocal_address(state: Any) -> bool:
             scope = addr.get("scope", "")
             if not address or address.startswith("127.") or address == "::1":
                 continue
-            if scope and scope != "global" and scope != "link":
+            if scope and scope != "general" and scope != "link":
                 continue
             return True
     return False

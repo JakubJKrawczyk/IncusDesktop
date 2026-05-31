@@ -48,7 +48,7 @@ class InstanceStateNetworkAddress(BaseModel):
     family: str | None = None   # "inet" | "inet6"
     address: str | None = None
     netmask: str | None = None  # uwaga: STRING w Incus ("64", "24"), nie int
-    scope: str | None = None    # "local" | "link" | "global"
+    scope: str | None = None    # "local" | "link" | "general"
 
 
 class InstanceStateNetworkCounters(BaseModel):
