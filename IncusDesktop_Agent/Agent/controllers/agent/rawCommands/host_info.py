@@ -5,13 +5,10 @@ agent runs on. Endpoints here never mutate anything — pure READ.
 GUI uses them for the dashboard, diagnostic panels, and preflight
 checks before more expensive actions.
 
-Anything readable from /proc or /sys goes through Python open() —
-no shelling out to `cat`. Only binaries that cannot be replaced
-(lsblk, ip, systemctl, journalctl, nvidia-smi, sensors) are invoked
-via _executor.run with a fixed argv.
-
-Every response includes `collected_at` (UTC timestamp) so the GUI
-can cache and decide when to refresh.
+Everything runs through _executor.run with a fixed argv: /proc and
+/sys files via the `cat` helper, other sources via their binaries
+(lsblk, ip, uname, systemctl, journalctl, nvidia-smi, sensors, incus).
+Raw stdout is parsed into tables with GlobalHelpers.StrHelper.parse_table.
 
 Endpoints are grouped into three priority tiers — see sections below.
 """
@@ -49,25 +46,58 @@ class HostInfoController:
     async def Memory(self):
         """RAM + swap: total/available/used/free/cached/buffers, swap*.
         Source: /proc/meminfo. Optionally top-N processes by RSS."""
-        return await run(["cat", "/proc/meminfo"], timeout=5)
+
+        meminfo = await HostInfoController.cat("/proc/meminfo")
+
+        meminfo_table = GlobalHelpers.StrHelper.parse_table(meminfo)
+
+
+        return
 
     async def Disk(self):
         """Block devices + mounts: model, size, type (HDD/SSD/NVMe),
         per-mount used/free/fs/mountpoint. Incus storage pools listed
         in a separate section. Sources: lsblk -J, df, incus storage list."""
-        return await run(["df", "-h"], timeout=5)
+
+        lsblk = (await run(["lsblk", "-J"], timeout=5)).stdout
+        df = (await run(["df", "-h"], timeout=5)).stdout
+        storage = (await run(["incus", "storage", "list"], timeout=5)).stdout
+
+        lsblk_table = GlobalHelpers.StrHelper.parse_table(lsblk)
+        df_table = GlobalHelpers.StrHelper.parse_table(df)
+        storage_table = GlobalHelpers.StrHelper.parse_table(storage)
+
+
+        return
 
     async def Network(self):
         """Network interfaces: per-iface rx/tx, errors, MTU, state,
         MAC, IPv4/v6. Incus bridges (incusbr0 etc.) in a separate section.
         Sources: /proc/net/dev, ip -j addr, ip -j link."""
-        return (await run(["ip", "-j", "link"], timeout=5)).stdout
+
+        net_dev = await HostInfoController.cat("/proc/net/dev")
+        ip_addr = (await run(["ip", "-j", "addr"], timeout=5)).stdout
+        ip_link = (await run(["ip", "-j", "link"], timeout=5)).stdout
+
+        net_dev_table = GlobalHelpers.StrHelper.parse_table(net_dev)
+        ip_addr_table = GlobalHelpers.StrHelper.parse_table(ip_addr)
+        ip_link_table = GlobalHelpers.StrHelper.parse_table(ip_link)
+
+
+        return
 
     async def Uptime(self):
         """Host uptime + OS info + kernel + hostname + arch.
         Sources: /proc/uptime, /etc/os-release, uname.
         Used mainly by the 'About this host' panel in the GUI."""
-        uptime = (await run(["/proc/uptime"], timeout=5)).stdout
+
+        uptime = await HostInfoController.cat("/proc/uptime")
+        os_release = await HostInfoController.cat("/etc/os-release")
+        uname = (await run(["uname", "-a"], timeout=5)).stdout
+
+        uptime_table = GlobalHelpers.StrHelper.parse_table(uptime)
+        os_release_table = GlobalHelpers.StrHelper.parse_table(os_release)
+        uname_table = GlobalHelpers.StrHelper.parse_table(uname)
 
 
         return

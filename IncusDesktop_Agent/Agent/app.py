@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 import atexit
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from Agent.exceptions import AgentError, IncusUnavailableError
 from Agent.blueprints.instances_bp import bp as instances_bp
@@ -45,12 +45,20 @@ from Agent.blueprints.cluster_bp import bp as cluster_bp
 from Agent.blueprints.certificates_bp import bp as certificates_bp
 from Agent.blueprints.operations_bp import bp as operations_bp
 
+from Agent.blueprints.rawCommands.host_info_bp import raw_host_info_bp
+
 from Agent.blueprints.scenarios.instance_bp import bp as scenarios_instance_bp
 from Agent.blueprints.scenarios.host_bp import bp as scenarios_host_bp
 from Agent.blueprints.scenarios.dashboard_bp import bp as scenarios_dashboard_bp
 from Agent.blueprints.scenarios.runs_bp import bp as scenarios_runs_bp
 
 from Agent.utility.rest_client import IncusRestClient
+
+
+# Blueprint names exempt from the Incus-availability gate (raw host
+# commands that don't require the Incus socket). Add new raw-command
+# blueprints here as they are introduced.
+INCUS_FREE_BLUEPRINTS = {"host_info"}
 
 
 def create_app() -> Flask:
@@ -61,6 +69,12 @@ def create_app() -> Flask:
 
     @app.before_request
     def check_requirements():
+        # Raw-command blueprints run host-level commands and don't talk to
+        # the Incus socket — exempt them so they stay testable on a host
+        # without Incus. Everything that uses the Incus API is still gated.
+        if request.blueprint in INCUS_FREE_BLUEPRINTS:
+            return None
+
         is_dev = os.getenv("DEVELOPER_MODE")
 
         if not Path(IncusRestClient.DEFAULT_SOCKET).exists() and not is_dev:
@@ -122,6 +136,9 @@ def create_app() -> Flask:
     app.register_blueprint(cluster_bp)
     app.register_blueprint(certificates_bp)
     app.register_blueprint(operations_bp)
+
+    # Raw commands (host-level reads/admin)
+    app.register_blueprint(raw_host_info_bp)
 
     # Scenarios (agent-side orchestrations)
     app.register_blueprint(scenarios_instance_bp)

@@ -1,0 +1,187 @@
+{
+  "info": {
+    "name": "IncusDesktop Agent — Host Info",
+    "description": "Raw host-info read endpoints (raw_host_info_bp, url_prefix /host/info).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "MUST HAVE",
+      "item": [
+        {
+          "name": "CPU",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/cpu",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "cpu"]
+            },
+            "description": "CPU info: model, cores, threads, clock, per-core %, loadavg. Sources: /proc/stat, /proc/cpuinfo, /proc/loadavg."
+          }
+        },
+        {
+          "name": "Memory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/memory",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "memory"]
+            },
+            "description": "RAM + swap. Source: /proc/meminfo."
+          }
+        },
+        {
+          "name": "Disk",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/disk",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "disk"]
+            },
+            "description": "Block devices + mounts + Incus storage pools. Sources: lsblk -J, df, incus storage list."
+          }
+        },
+        {
+          "name": "Network",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/network",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "network"]
+            },
+            "description": "Network interfaces: rx/tx, errors, MTU, state, MAC, IPv4/v6. Sources: /proc/net/dev, ip -j addr, ip -j link."
+          }
+        },
+        {
+          "name": "Uptime",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/uptime",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "uptime"]
+            },
+            "description": "Host uptime + OS + kernel + hostname + arch. Sources: /proc/uptime, /etc/os-release, uname."
+          }
+        },
+        {
+          "name": "Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/services",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "services"]
+            },
+            "description": "Status of whitelisted systemd units (incus, docker, ssh...). Source: systemctl is-active / is-enabled."
+          }
+        }
+      ]
+    },
+    {
+      "name": "SHOULD HAVE",
+      "item": [
+        {
+          "name": "Processes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/processes",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "processes"]
+            },
+            "description": "Top-N processes by CPU/RSS. Source: ps -eo ... --sort=-%cpu."
+          }
+        },
+        {
+          "name": "Incus Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/incus",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "incus"]
+            },
+            "description": "Aggregate Incus state: version, instance counts per status, projects/networks/pools/profiles, active operations."
+          }
+        },
+        {
+          "name": "Journal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/journal",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "journal"]
+            },
+            "description": "Structured journald logs for whitelisted units. Source: journalctl -u <unit> -o json -n N."
+          }
+        }
+      ]
+    },
+    {
+      "name": "NICE TO HAVE",
+      "item": [
+        {
+          "name": "GPU",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/gpu",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "gpu"]
+            },
+            "description": "GPU info (nvidia first): model, util%, temp, vram, power. Source: nvidia-smi."
+          }
+        },
+        {
+          "name": "Sensors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/sensors",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "sensors"]
+            },
+            "description": "Temperatures, fan speeds, voltages. Source: sensors -j (lm-sensors)."
+          }
+        },
+        {
+          "name": "Containers Runtime",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/host/info/containers-runtime",
+              "host": ["{{baseUrl}}"],
+              "path": ["host", "info", "containers-runtime"]
+            },
+            "description": "Detect docker/podman/k3s: version, daemon alive, container counts."
+          }
+        }
+      ]
+    }
+  ]
+}
