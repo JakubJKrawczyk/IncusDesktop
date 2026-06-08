@@ -6,9 +6,11 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/.venv-linux/lib/python3.12/site-packages" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/python3.12/site-packages" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.14 (IncusDesktop_Agent)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="WSL (Ubuntu): (/mnt/c/Users/zresp/Desktop/Projects/IncusDesktop/IncusDesktop_Agent/.venv-linux/bin/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">

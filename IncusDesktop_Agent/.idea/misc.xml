@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.14 (IncusDesktop_Agent)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.14 (IncusDesktop_Agent)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="WSL (Ubuntu): (/mnt/c/Users/zresp/Desktop/Projects/IncusDesktop/IncusDesktop_Agent/.venv-linux/bin/python)" project-jdk-type="Python SDK" />
 </project>

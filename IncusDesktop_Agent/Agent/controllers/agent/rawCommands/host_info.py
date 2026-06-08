@@ -32,7 +32,7 @@ class HostInfoController:
         """CPU info: model, cores, threads, clock, per-core %, loadavg.
         Sources: /proc/stat, /proc/cpuinfo, /proc/loadavg."""
 
-        stat = (await run(["cat", "/proc/stat", "|", "grep", "cpu"], timeout=5)).stdout
+        stat = (await run(["cat /proc/stat | grep cpu"], timeout=5)).stdout
         cpu_info = await HostInfoController.cat("/proc/cpuinfo")
         loadavg = await HostInfoController.cat("/proc/loadavg")
 
