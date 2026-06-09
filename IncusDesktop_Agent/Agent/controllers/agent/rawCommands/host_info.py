@@ -32,16 +32,30 @@ class HostInfoController:
         """CPU info: model, cores, threads, clock, per-core %, loadavg.
         Sources: /proc/stat, /proc/cpuinfo, /proc/loadavg."""
 
-        stat = (await run(["cat /proc/stat | grep cpu"], timeout=5)).stdout
+        stat = (await run(["cat", "/proc/stat"], timeout=5)).stdout
         cpu_info = await HostInfoController.cat("/proc/cpuinfo")
         loadavg = await HostInfoController.cat("/proc/loadavg")
 
+        # PROCESS STAT
         stat_table = GlobalHelpers.StrHelper.parse_table(stat)
-        cpu_info_table = GlobalHelpers.StrHelper.parse_table(cpu_info)
-        loadavg_table = GlobalHelpers.StrHelper.parse_table(loadavg)
 
+        # PROCESS CPU INFO
+        keys, values = [], []
+        lines = cpu_info.splitlines()
+        for l in cpu_info.splitlines():
+            if not l.strip():
+                continue
+            if ":" not in l:
+                continue
+            key, value = l.split(":", 1)
+            keys.append(key.strip())
+            values.append(value.strip())
 
-        return
+        cpu_info_table = {}
+        for k,v in zip(keys, values):
+            cpu_info_table[k]=v
+
+        return {"cpu":{"stat":stat_table, "cpu_info":cpu_info_table, "loadavg":loadavg}}
 
     async def Memory(self):
         """RAM + swap: total/available/used/free/cached/buffers, swap*.
@@ -49,10 +63,13 @@ class HostInfoController:
 
         meminfo = await HostInfoController.cat("/proc/meminfo")
 
-        meminfo_table = GlobalHelpers.StrHelper.parse_table(meminfo)
+        meminfo_table = {}
 
+        for l in meminfo.splitlines():
+            key, value = l.split(":",1 )
+            meminfo_table[key.strip()] = value.strip()
 
-        return
+        return {"memory": meminfo_table}
 
     async def Disk(self):
         """Block devices + mounts: model, size, type (HDD/SSD/NVMe),
