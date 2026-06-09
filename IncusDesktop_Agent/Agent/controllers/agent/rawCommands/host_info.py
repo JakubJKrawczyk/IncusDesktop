@@ -41,7 +41,6 @@ class HostInfoController:
 
         # PROCESS CPU INFO
         keys, values = [], []
-        lines = cpu_info.splitlines()
         for l in cpu_info.splitlines():
             if not l.strip():
                 continue
