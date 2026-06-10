@@ -1,0 +1,226 @@
+{
+  "info": {
+    "name": "IncusDesktop Agent — Raw Commands",
+    "description": "All rawCommands endpoints of the agent. Currently the module exposes a single blueprint: raw_host_info_bp (url_prefix /host/info, read-only). Planned modules (controllers exist as empty stubs, no blueprints yet): Docker Workloads, Host Admin, Incus Helpers — folders below are placeholders.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Host Info",
+      "description": "raw_host_info_bp — pure READ host stats for dashboard, diagnostics and preflight checks. Grouped by priority tier.",
+      "item": [
+        {
+          "name": "MUST HAVE",
+          "item": [
+            {
+              "name": "CPU",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/cpu",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "cpu"]
+                },
+                "description": "CPU info: model, cores, threads, clock, per-core %, loadavg. Sources: /proc/stat, /proc/cpuinfo, /proc/loadavg."
+              }
+            },
+            {
+              "name": "Memory",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/memory",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "memory"]
+                },
+                "description": "RAM + swap: total/available/used/free/cached/buffers. Source: /proc/meminfo."
+              }
+            },
+            {
+              "name": "Disk",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/disk",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "disk"]
+                },
+                "description": "Block devices + mounts + Incus storage pools. Sources: lsblk -J, df -h, incus storage list."
+              }
+            },
+            {
+              "name": "Network",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/network",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "network"]
+                },
+                "description": "Network interfaces: rx/tx, errors, MTU, state, MAC, IPv4/v6. Incus bridges in a separate section. Sources: /proc/net/dev, ip -j addr, ip -j link."
+              }
+            },
+            {
+              "name": "Uptime",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/uptime",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "uptime"]
+                },
+                "description": "Host uptime + OS + kernel + hostname + arch. Sources: /proc/uptime, /etc/os-release, uname -a."
+              }
+            },
+            {
+              "name": "Services",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/services",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "services"]
+                },
+                "description": "Status of whitelisted systemd units (incus, incus-startup, incus.socket, docker, ssh): active/inactive/failed + enabled. Source: systemctl is-active / is-enabled."
+              }
+            }
+          ]
+        },
+        {
+          "name": "SHOULD HAVE",
+          "item": [
+            {
+              "name": "Processes",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/processes",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "processes"]
+                },
+                "description": "Top-N processes by CPU/RSS, optional name filter. Source: ps -eo pid,user,%cpu,%mem,rss,comm --sort=-%cpu."
+              }
+            },
+            {
+              "name": "Incus Overview",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/incus",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "incus"]
+                },
+                "description": "Aggregate Incus state: version, instance counts per status (running/stopped/frozen), counts of projects/networks/pools/profiles, active operations. Cacheable — dashboard polls this often."
+              }
+            },
+            {
+              "name": "Journal",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/journal?unit=incus&lines=50",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "journal"],
+                  "query": [
+                    {
+                      "key": "unit",
+                      "value": "incus",
+                      "description": "Whitelisted unit (incus, docker)."
+                    },
+                    {
+                      "key": "lines",
+                      "value": "50",
+                      "description": "Number of entries (journalctl -n N)."
+                    },
+                    {
+                      "key": "since",
+                      "value": "5 min ago",
+                      "description": "Time window (journalctl --since).",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Structured journald logs for whitelisted units, returned as JSON entries. Params per controller docstring: unit, lines, since. Source: journalctl -u <unit> --no-pager -o json -n N."
+              }
+            }
+          ]
+        },
+        {
+          "name": "NICE TO HAVE",
+          "item": [
+            {
+              "name": "GPU",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/gpu",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "gpu"]
+                },
+                "description": "GPU info (nvidia first): model, util%, temp, vram used/total, power draw, GPU processes. Source: nvidia-smi --query-gpu. Graceful degrade: missing nvidia-smi returns {available: false}."
+              }
+            },
+            {
+              "name": "Sensors",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/sensors",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "sensors"]
+                },
+                "description": "Temperatures (CPU, NVMe, chipset), fan speeds, voltages. Source: sensors -j (lm-sensors). Graceful degrade when absent."
+              }
+            },
+            {
+              "name": "Containers Runtime",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/host/info/containers-runtime",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["host", "info", "containers-runtime"]
+                },
+                "description": "Detect docker/podman/k3s: version, daemon alive, container counts. Preflight for the Docker workloads panel."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Docker Workloads (planned)",
+      "description": "Controller docker_workloads.py is an empty stub — no blueprint registered yet. Add requests here once endpoints exist.",
+      "item": []
+    },
+    {
+      "name": "Host Admin (planned)",
+      "description": "Controller host_admin.py is an empty stub — no blueprint registered yet. Add requests here once endpoints exist.",
+      "item": []
+    },
+    {
+      "name": "Incus Helpers (planned)",
+      "description": "Controller incus_helpers.py is an empty stub — no blueprint registered yet. Add requests here once endpoints exist.",
+      "item": []
+    }
+  ]
+}
