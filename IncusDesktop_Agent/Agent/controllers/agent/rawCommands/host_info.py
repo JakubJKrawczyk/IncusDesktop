@@ -12,6 +12,11 @@ Raw stdout is parsed into tables with GlobalHelpers.StrHelper.parse_table.
 
 Endpoints are grouped into three priority tiers — see sections below.
 """
+import json
+from tabnanny import check
+
+from pydantic import Json
+
 from Agent.controllers.agent.rawCommands._executor import CommandResult, run
 from Utilities import consts
 from Utilities.logger import Logger, LoggLevel
@@ -60,6 +65,7 @@ class HostInfoController:
         """RAM + swap: total/available/used/free/cached/buffers, swap*.
         Source: /proc/meminfo. Optionally top-N processes by RSS."""
 
+        # PROCESS MEM INFO
         meminfo = await HostInfoController.cat("/proc/meminfo")
 
         meminfo_table = {}
@@ -77,30 +83,37 @@ class HostInfoController:
 
         lsblk = (await run(["lsblk", "-J"], timeout=5)).stdout
         df = (await run(["df", "-h"], timeout=5)).stdout
-        storage = (await run(["incus", "storage", "list"], timeout=5)).stdout
 
-        lsblk_table = GlobalHelpers.StrHelper.parse_table(lsblk)
-        df_table = GlobalHelpers.StrHelper.parse_table(df)
-        storage_table = GlobalHelpers.StrHelper.parse_table(storage)
+        lsblk = json.loads(lsblk)
 
+        # PROCESS DF
+        df_keys = df.splitlines()[0]
+        df_keys = [l for l in df_keys.split(" ") if l != ""]
+        df_dit = []
+        for l in df.splitlines()[1:]:
+            splitted = [x for x in l.split(" ") if x != ""]
+            ob = {}
+            for ll,k in zip(splitted, df_keys):
+                if not ll.strip():
+                    continue
+                ll = ll.strip()
+                ob[k]=ll
+            df_dit.append(ob)
 
-        return
+        return {"disk":{"lsblk":lsblk, "df":df_dit}}
 
     async def Network(self):
         """Network interfaces: per-iface rx/tx, errors, MTU, state,
         MAC, IPv4/v6. Incus bridges (incusbr0 etc.) in a separate section.
         Sources: /proc/net/dev, ip -j addr, ip -j link."""
 
-        net_dev = await HostInfoController.cat("/proc/net/dev")
         ip_addr = (await run(["ip", "-j", "addr"], timeout=5)).stdout
         ip_link = (await run(["ip", "-j", "link"], timeout=5)).stdout
 
-        net_dev_table = GlobalHelpers.StrHelper.parse_table(net_dev)
-        ip_addr_table = GlobalHelpers.StrHelper.parse_table(ip_addr)
-        ip_link_table = GlobalHelpers.StrHelper.parse_table(ip_link)
+        ip_addr_obj = json.loads(ip_addr)
+        ip_link_obj = json.loads(ip_link)
 
-
-        return
+        return {"network": {"addr":ip_addr_obj, "link":ip_link_obj}}
 
     async def Uptime(self):
         """Host uptime + OS info + kernel + hostname + arch.
@@ -111,18 +124,29 @@ class HostInfoController:
         os_release = await HostInfoController.cat("/etc/os-release")
         uname = (await run(["uname", "-a"], timeout=5)).stdout
 
-        uptime_table = GlobalHelpers.StrHelper.parse_table(uptime)
-        os_release_table = GlobalHelpers.StrHelper.parse_table(os_release)
-        uname_table = GlobalHelpers.StrHelper.parse_table(uname)
+        # PROCESS OS RELEASE
 
+        os_release_obj = {}
+        for l in os_release.splitlines():
+            k, v = l.split("=")
+            k = k.strip()
+            v = v.strip()
 
-        return
+            os_release_obj[k] = v
+
+        return {"uptime": {"uptime": uptime, "os_release": os_release_obj, "uname": uname}}
 
     async def Services(self):
-        """Status of whitelisted systemd units (incus, incus-startup,
-        incus.socket, docker, ssh): active/inactive/failed + enabled.
-        Source: systemctl is-active / is-enabled."""
-        pass
+        """Status of whitelisted systemd units: active/inactive/failed + enabled."""
+
+        # PROCESS UNITS
+        units = ["incus", "incus-startup", "incus.socket", "docker", "ssh"]
+        result = {}
+        for unit in units:
+            active = (await run(["systemctl", "is-active", unit], ok_codes=(0,3,4))).stdout.strip()
+            enabled = (await run(["systemctl", "is-enabled", unit], ok_codes=(0,1,4))).stdout.strip()
+            result[unit] = {"active": active, "enabled": enabled}
+        return result
 
     # ─── SHOULD HAVE (second sprint) ──────────────────────────────────────
     # Purpose: data for more detailed views — "Processes" tab,

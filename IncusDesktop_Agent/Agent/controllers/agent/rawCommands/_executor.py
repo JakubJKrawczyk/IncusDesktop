@@ -45,6 +45,7 @@ async def run(
     timeout: float = 30.0,
     cwd: str | None = None,
     env: dict[str, str] | None = None,
+    ok_codes: tuple[int, ...] = (0,),
 ) -> CommandResult:
     """Execute argv with a timeout.
 
@@ -63,6 +64,7 @@ async def run(
             stderr=asyncio.subprocess.PIPE,
             cwd=cwd,
             env=env,
+
         )
     except FileNotFoundError as exc:
         logger.line(f"Binary not found: {argv[0]!r}", LoggLevel.ERROR)
@@ -101,7 +103,7 @@ async def run(
             },
         )
 
-    if return_code != 0:
+    if return_code not in ok_codes:
         logger.line(f"Command finished argv={argv} return_code={return_code}", LoggLevel.ERROR)
         raise CommandFailedError(
             f"Command exited with code {return_code}.",
