@@ -6,4 +6,5 @@ IncusDesktop_Agent/claude_ws
 *__pycache__*
 *egg-info*
 .venv*
-
+/build-deb
+/.idea

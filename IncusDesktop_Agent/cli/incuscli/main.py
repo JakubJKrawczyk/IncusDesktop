@@ -5,10 +5,10 @@ from incuscli.commands.setup import setupApp
 
 app = typer.Typer(
     name="incuscli",
-    help="Incus-Agent Agent API",
+    help="Incus-CLI Agent API",
     no_args_is_help=True
 )
-app.add_typer(agentApp, name="agents")
+app.add_typer(agentApp, name="agent")
 app.add_typer(setupApp, name="setup")
 
 

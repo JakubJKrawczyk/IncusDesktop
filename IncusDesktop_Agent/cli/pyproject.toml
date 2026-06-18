@@ -7,6 +7,7 @@ dependencies = [
     "typer>=0.15.0",
     "rich>=13.9.4",
     "httpx>=0.27.2",
+    "incus-shared"
 ]
 
 [project.scripts]

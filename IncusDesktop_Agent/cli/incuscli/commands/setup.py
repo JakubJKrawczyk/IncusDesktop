@@ -17,10 +17,10 @@ def setup():
     print("-"*40)
     print("")
     config_path =  Path(ConfigVariables.DEFAULT_CONFIG_PATH.value)
-    logs_path = Path(ConfigVariables.DEFAULT_LOGS_PATH)
-    logs_incus_path = Path(ConfigVariables.DEFAULT_LOGS_INCUS)
-    logs_cli_path = Path(ConfigVariables.DEFAULT_LOGS_CLI)
-    logs_agent_path = Path(ConfigVariables.DEFAULT_LOGS_AGENT)
+    logs_path = Path(ConfigVariables.DEFAULT_LOGS_PATH.value)
+    logs_incus_path = Path(ConfigVariables.DEFAULT_LOGS_INCUS.value)
+    logs_cli_path = Path(ConfigVariables.DEFAULT_LOGS_CLI.value)
+    logs_agent_path = Path(ConfigVariables.DEFAULT_LOGS_AGENT.value)
 
     #DEFAULT config file path
     if not config_path.exists():
